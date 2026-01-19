@@ -268,6 +268,76 @@ export async function checkStreak(): Promise<{ hasStreak: boolean; streakCount: 
     }
 }
 
+// Delete a flex time entry (for correcting mistakes)
+export async function deleteFlexTimeEntry(
+    entryTimestamp: Date
+): Promise<{ success: boolean; message: string; newBalance: number }> {
+    if (!db) {
+        return {
+            success: false,
+            message: 'Firebase not configured',
+            newBalance: 0
+        };
+    }
+
+    const weekId = getWeekId();
+    const docRef = doc(db, 'flexTime', weekId);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+        return {
+            success: false,
+            message: 'No flex time data found for this week',
+            newBalance: 0
+        };
+    }
+
+    const data = docSnap.data();
+    const entries = data.entries.map((e: FlexTimeEntry & { timestamp: { toDate: () => Date } }) => ({
+        ...e,
+        timestamp: e.timestamp.toDate()
+    }));
+
+    // Find and remove the entry with matching timestamp
+    const entryIndex = entries.findIndex(
+        (e: FlexTimeEntry) => e.timestamp.getTime() === entryTimestamp.getTime()
+    );
+
+    if (entryIndex === -1) {
+        return {
+            success: false,
+            message: 'Entry not found',
+            newBalance: data.balance
+        };
+    }
+
+    const removedEntry = entries[entryIndex];
+    const updatedEntries = entries.filter((_: FlexTimeEntry, i: number) => i !== entryIndex);
+    const newBalance = Math.max(0, data.balance - removedEntry.minutes);
+
+    // Convert timestamps back for Firestore
+    const entriesForFirestore = updatedEntries.map((e: FlexTimeEntry) => ({
+        ...e,
+        timestamp: e.timestamp
+    }));
+
+    await updateDoc(docRef, {
+        balance: newBalance,
+        entries: entriesForFirestore,
+        lastUpdated: new Date()
+    });
+
+    // Update weekly stats
+    const weekStart = getWeekStart();
+    await updateWeeklyStats(weekId, weekStart, newBalance);
+
+    return {
+        success: true,
+        message: `Removed ${removedEntry.minutes} minutes. New balance: ${newBalance} minutes`,
+        newBalance
+    };
+}
+
 // Format minutes as human-readable string
 export function formatMinutes(minutes: number): string {
     if (minutes < 60) {

@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { getWeeklyFlexTime, checkStreak } from '@/lib/flex-time';
-import { WeeklyFlexTime } from '@/types';
+import { getWeeklyFlexTime, checkStreak, deleteFlexTimeEntry } from '@/lib/flex-time';
+import { WeeklyFlexTime, FlexTimeEntry } from '@/types';
 import FlexTimeBalance from '@/components/FlexTimeBalance';
 import AddFlexTimeButton from '@/components/AddFlexTimeButton';
 import WeeklyNotes from '@/components/WeeklyNotes';
@@ -16,6 +16,8 @@ export default function ParentPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [authError, setAuthError] = useState('');
+    const [entryToDelete, setEntryToDelete] = useState<FlexTimeEntry | null>(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     const loadFlexTime = async () => {
         setLoading(true);
@@ -48,6 +50,26 @@ export default function ParentPage() {
         } catch (err: unknown) {
             const errorMessage = err instanceof Error ? err.message : 'Sign in failed';
             setAuthError(errorMessage);
+        }
+    };
+
+    const handleDeleteEntry = async () => {
+        if (!entryToDelete) return;
+
+        setDeleteLoading(true);
+        try {
+            const result = await deleteFlexTimeEntry(entryToDelete.timestamp);
+            if (result.success) {
+                await loadFlexTime();
+            } else {
+                setError(result.message);
+            }
+        } catch (err) {
+            console.error('Failed to delete entry:', err);
+            setError('Failed to delete entry');
+        } finally {
+            setDeleteLoading(false);
+            setEntryToDelete(null);
         }
     };
 
@@ -152,13 +174,22 @@ export default function ParentPage() {
                                 ) : (
                                     flexTime.entries.map((entry, index) => (
                                         <li key={index} className="activity-item">
-                                            <span className="activity-time">
-                                                {new Date(entry.timestamp).toLocaleString()}
-                                            </span>
-                                            <span className="activity-amount">+{entry.minutes} min</span>
-                                            {entry.addedByName && (
-                                                <span className="activity-by">by {entry.addedByName}</span>
-                                            )}
+                                            <div className="activity-details">
+                                                <span className="activity-time">
+                                                    {new Date(entry.timestamp).toLocaleString()}
+                                                </span>
+                                                <span className="activity-amount">+{entry.minutes} min</span>
+                                                {entry.addedByName && (
+                                                    <span className="activity-by">by {entry.addedByName}</span>
+                                                )}
+                                            </div>
+                                            <button
+                                                className="delete-entry-btn"
+                                                onClick={() => setEntryToDelete(entry)}
+                                                title="Delete entry"
+                                            >
+                                                &times;
+                                            </button>
                                         </li>
                                     ))
                                 )}
@@ -167,6 +198,48 @@ export default function ParentPage() {
                     </>
                 )}
             </main>
+
+            {/* Delete Confirmation Modal */}
+            {entryToDelete && (
+                <div className="delete-modal-overlay">
+                    <div className="delete-modal">
+                        <div className="delete-modal-warning">
+                            <span className="warning-icon">⚠️</span>
+                            <h3>Are you sure?</h3>
+                        </div>
+                        <p className="delete-modal-message">
+                            Deleting flex time should only be done to correct a mistake,
+                            not to take away time that was already earned. This action
+                            cannot be undone.
+                        </p>
+                        <div className="delete-modal-details">
+                            <strong>{entryToDelete.minutes} minutes</strong> added on{' '}
+                            {new Date(entryToDelete.timestamp).toLocaleString()}
+                            {entryToDelete.note && (
+                                <div className="delete-modal-note">
+                                    Note: &quot;{entryToDelete.note}&quot;
+                                </div>
+                            )}
+                        </div>
+                        <div className="delete-modal-buttons">
+                            <button
+                                className="cancel-button"
+                                onClick={() => setEntryToDelete(null)}
+                                disabled={deleteLoading}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="delete-button"
+                                onClick={handleDeleteEntry}
+                                disabled={deleteLoading}
+                            >
+                                {deleteLoading ? 'Deleting...' : 'Delete Entry'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
