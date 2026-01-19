@@ -88,32 +88,45 @@ export async function getWeeklyFlexTime(): Promise<WeeklyFlexTime> {
         };
     }
 
-    const weekId = getWeekId();
-    const docRef = doc(db, 'flexTime', weekId);
-    const docSnap = await getDoc(docRef);
+    try {
+        const weekId = getWeekId();
+        const docRef = doc(db, 'flexTime', weekId);
+        const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists()) {
-        const data = docSnap.data();
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            return {
+                weekStart: data.weekStart.toDate(),
+                weekEnd: data.weekEnd.toDate(),
+                balance: data.balance,
+                entries: data.entries.map((e: FlexTimeEntry & { timestamp: { toDate: () => Date } }) => ({
+                    ...e,
+                    timestamp: e.timestamp.toDate()
+                })),
+                lastUpdated: data.lastUpdated.toDate()
+            };
+        }
+
+        // No data for this week yet, return empty state
         return {
-            weekStart: data.weekStart.toDate(),
-            weekEnd: data.weekEnd.toDate(),
-            balance: data.balance,
-            entries: data.entries.map((e: FlexTimeEntry & { timestamp: { toDate: () => Date } }) => ({
-                ...e,
-                timestamp: e.timestamp.toDate()
-            })),
-            lastUpdated: data.lastUpdated.toDate()
+            weekStart,
+            weekEnd,
+            balance: 0,
+            entries: [],
+            lastUpdated: new Date()
+        };
+    } catch (error) {
+        // Handle permission errors (e.g., when user is not logged in)
+        // Return empty state so kids view can still display
+        console.warn('Could not fetch flex time data:', error);
+        return {
+            weekStart,
+            weekEnd,
+            balance: 0,
+            entries: [],
+            lastUpdated: new Date()
         };
     }
-
-    // No data for this week yet, return empty state
-    return {
-        weekStart,
-        weekEnd,
-        balance: 0,
-        entries: [],
-        lastUpdated: new Date()
-    };
 }
 
 // Add flex time (10 minutes)
@@ -207,45 +220,52 @@ export async function checkStreak(): Promise<{ hasStreak: boolean; streakCount: 
         return { hasStreak: false, streakCount: 0 };
     }
 
-    const statsRef = collection(db, 'weeklyStats');
-    const q = query(statsRef, orderBy('weekStart', 'desc'), limit(WEEKS_FOR_STREAK + 1));
-    const querySnap = await getDocs(q);
+    try {
+        const statsRef = collection(db, 'weeklyStats');
+        const q = query(statsRef, orderBy('weekStart', 'desc'), limit(WEEKS_FOR_STREAK + 1));
+        const querySnap = await getDocs(q);
 
-    if (querySnap.empty) {
+        if (querySnap.empty) {
+            return { hasStreak: false, streakCount: 0 };
+        }
+
+        const stats: WeeklyStats[] = [];
+        querySnap.forEach((docSnap) => {
+            const data = docSnap.data();
+            stats.push({
+                weekId: data.weekId,
+                weekStart: data.weekStart.toDate(),
+                totalEarned: data.totalEarned,
+                maxedOut: data.maxedOut
+            });
+        });
+
+        // Count consecutive maxed-out weeks (excluding current incomplete week)
+        let streakCount = 0;
+        const currentWeekId = getWeekId();
+
+        for (const stat of stats) {
+            // Skip current week if it's not maxed out yet
+            if (stat.weekId === currentWeekId && !stat.maxedOut) {
+                continue;
+            }
+            if (stat.maxedOut) {
+                streakCount++;
+            } else {
+                break;
+            }
+        }
+
+        return {
+            hasStreak: streakCount >= WEEKS_FOR_STREAK,
+            streakCount
+        };
+    } catch (error) {
+        // Handle permission errors (e.g., when user is not logged in)
+        // Return no streak so kids view can still display
+        console.warn('Could not fetch streak data:', error);
         return { hasStreak: false, streakCount: 0 };
     }
-
-    const stats: WeeklyStats[] = [];
-    querySnap.forEach((docSnap) => {
-        const data = docSnap.data();
-        stats.push({
-            weekId: data.weekId,
-            weekStart: data.weekStart.toDate(),
-            totalEarned: data.totalEarned,
-            maxedOut: data.maxedOut
-        });
-    });
-
-    // Count consecutive maxed-out weeks (excluding current incomplete week)
-    let streakCount = 0;
-    const currentWeekId = getWeekId();
-
-    for (const stat of stats) {
-        // Skip current week if it's not maxed out yet
-        if (stat.weekId === currentWeekId && !stat.maxedOut) {
-            continue;
-        }
-        if (stat.maxedOut) {
-            streakCount++;
-        } else {
-            break;
-        }
-    }
-
-    return {
-        hasStreak: streakCount >= WEEKS_FOR_STREAK,
-        streakCount
-    };
 }
 
 // Format minutes as human-readable string
