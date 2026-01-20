@@ -1088,3 +1088,172 @@ h3 {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* ===== Day Preference Section ===== */
+.day-preference-section {
+  background: var(--color-card);
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  margin-top: 1rem;
+}
+
+.day-preference-section h3 {
+  color: var(--color-text);
+  margin-bottom: 1rem;
+}
+
+.decided-day {
+  background: var(--gradient-success);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-md);
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.decided-label {
+  display: block;
+  font-size: 0.9rem;
+  color: rgba(0, 0, 0, 0.7);
+  margin-bottom: 0.25rem;
+}
+
+.decided-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000;
+}
+
+.voting-status {
+  text-align: center;
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.voting-status.open {
+  background: rgba(102, 126, 234, 0.2);
+  color: var(--color-accent);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+.voting-status.locked {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-muted);
+}
+
+.kid-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.kid-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+}
+
+.kid-toggle.disabled {
+  opacity: 0.6;
+}
+
+.kid-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--color-text);
+}
+
+.day-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.day-toggle:hover:not(:disabled) {
+  border-color: var(--color-accent);
+}
+
+.day-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.toggle-option {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  transition: all 0.3s ease;
+  color: var(--color-text-muted);
+  z-index: 1;
+}
+
+.toggle-option.active {
+  color: #fff;
+}
+
+.day-toggle.saturday .toggle-option:first-child {
+  background: var(--gradient-primary);
+  color: #fff;
+}
+
+.day-toggle.sunday .toggle-option:last-child {
+  background: var(--gradient-secondary);
+  color: #fff;
+}
+
+.toggle-slider {
+  display: none;
+}
+
+.updating-indicator {
+  color: var(--color-accent);
+  font-weight: bold;
+  animation: pulse-glow 1s ease-in-out infinite;
+}
+
+.vote-tally {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.tally-item {
+  font-weight: 500;
+}
+
+.tally-divider {
+  opacity: 0.3;
+}
+
+/* Responsive adjustments for day preference */
+@media (max-width: 600px) {
+  .kid-toggle {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .kid-name {
+    font-size: 1rem;
+  }
+}

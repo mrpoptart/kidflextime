@@ -8,7 +8,8 @@ import {
     orderBy,
     limit,
     getDocs,
-    arrayUnion
+    arrayUnion,
+    onSnapshot
 } from 'firebase/firestore';
 import { db, isFirebaseConfigured } from './firebase';
 import {
@@ -349,4 +350,208 @@ export function formatMinutes(minutes: number): string {
         return `${hours} hour${hours > 1 ? 's' : ''}`;
     }
     return `${hours}h ${mins}m`;
+}
+
+// ===== Day Preference Functions =====
+
+export type DayPreference = 'saturday' | 'sunday';
+
+export interface KidDayPreferences {
+    charlie: DayPreference;
+    malcolm: DayPreference;
+    henry: DayPreference;
+}
+
+export interface DayPreferenceData {
+    weekId: string;
+    preferences: KidDayPreferences;
+    lastUpdated: Date;
+}
+
+export const KIDS = ['charlie', 'malcolm', 'henry'] as const;
+export type KidName = typeof KIDS[number];
+
+// Check if we're past Saturday midnight (decision is locked)
+export function isDecisionLocked(date: Date = new Date()): boolean {
+    const day = date.getDay();
+    // Sunday is 0, Saturday is 6
+    // Decision locks at Saturday midnight (start of Sunday)
+    // So it's locked on Sunday (day === 0)
+    return day === 0;
+}
+
+// Check if voting should be re-enabled (after Sunday 12 PM when week resets)
+export function isVotingEnabled(date: Date = new Date()): boolean {
+    const weekEnd = getWeekEnd(date);
+    // Voting is enabled when current time is after the week end (Sunday 12 PM)
+    // OR when it's not Sunday yet (Monday through Saturday)
+    const day = date.getDay();
+
+    if (day === 0) {
+        // It's Sunday - check if we're past noon (week has reset)
+        const hours = date.getHours();
+        return hours >= 12;
+    }
+    // Monday through Saturday - voting is enabled
+    return true;
+}
+
+// Calculate which day wins based on preferences
+export function calculateWinningDay(preferences: KidDayPreferences): DayPreference {
+    const saturdayVotes = Object.values(preferences).filter(p => p === 'saturday').length;
+    const sundayVotes = Object.values(preferences).filter(p => p === 'sunday').length;
+
+    // Majority wins - if tied, Saturday wins (2-1 or 1-2 scenarios)
+    return saturdayVotes >= sundayVotes ? 'saturday' : 'sunday';
+}
+
+// Get the default preferences (all Saturday)
+function getDefaultPreferences(): KidDayPreferences {
+    return {
+        charlie: 'saturday',
+        malcolm: 'saturday',
+        henry: 'saturday'
+    };
+}
+
+// Get day preferences for current week
+export async function getDayPreferences(): Promise<DayPreferenceData> {
+    const weekId = getWeekId();
+    const defaultData: DayPreferenceData = {
+        weekId,
+        preferences: getDefaultPreferences(),
+        lastUpdated: new Date()
+    };
+
+    if (!db) {
+        return defaultData;
+    }
+
+    try {
+        const docRef = doc(db, 'dayPreferences', weekId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            return {
+                weekId: data.weekId,
+                preferences: data.preferences,
+                lastUpdated: data.lastUpdated.toDate()
+            };
+        }
+
+        return defaultData;
+    } catch (error) {
+        console.warn('Could not fetch day preferences:', error);
+        return defaultData;
+    }
+}
+
+// Update a kid's day preference
+export async function updateDayPreference(
+    kidName: KidName,
+    preference: DayPreference
+): Promise<{ success: boolean; message: string }> {
+    if (!db) {
+        return {
+            success: false,
+            message: 'Firebase not configured'
+        };
+    }
+
+    // Check if voting is enabled
+    if (!isVotingEnabled()) {
+        return {
+            success: false,
+            message: 'Voting is locked until the week resets on Sunday at noon'
+        };
+    }
+
+    // Check if decision is already locked (Saturday midnight passed)
+    if (isDecisionLocked()) {
+        return {
+            success: false,
+            message: 'Decision is locked! The day has been decided.'
+        };
+    }
+
+    const weekId = getWeekId();
+
+    try {
+        const docRef = doc(db, 'dayPreferences', weekId);
+        const docSnap = await getDoc(docRef);
+
+        let currentPreferences = getDefaultPreferences();
+
+        if (docSnap.exists()) {
+            currentPreferences = docSnap.data().preferences;
+        }
+
+        // Update the specific kid's preference
+        const updatedPreferences = {
+            ...currentPreferences,
+            [kidName]: preference
+        };
+
+        await setDoc(docRef, {
+            weekId,
+            preferences: updatedPreferences,
+            lastUpdated: new Date()
+        });
+
+        return {
+            success: true,
+            message: `${kidName.charAt(0).toUpperCase() + kidName.slice(1)}'s preference updated to ${preference}`
+        };
+    } catch (error) {
+        console.error('Failed to update day preference:', error);
+        return {
+            success: false,
+            message: 'Failed to update preference'
+        };
+    }
+}
+
+// Subscribe to day preferences (real-time updates)
+export function subscribeToDayPreferences(
+    callback: (data: DayPreferenceData) => void
+): () => void {
+    const weekId = getWeekId();
+
+    if (!db) {
+        callback({
+            weekId,
+            preferences: getDefaultPreferences(),
+            lastUpdated: new Date()
+        });
+        return () => {};
+    }
+
+    const docRef = doc(db, 'dayPreferences', weekId);
+
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            callback({
+                weekId: data.weekId,
+                preferences: data.preferences,
+                lastUpdated: data.lastUpdated.toDate()
+            });
+        } else {
+            callback({
+                weekId,
+                preferences: getDefaultPreferences(),
+                lastUpdated: new Date()
+            });
+        }
+    }, (error) => {
+        console.warn('Day preferences subscription error:', error);
+        callback({
+            weekId,
+            preferences: getDefaultPreferences(),
+            lastUpdated: new Date()
+        });
+    });
+
+    return unsubscribe;
 }
