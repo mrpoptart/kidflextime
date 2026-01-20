@@ -1,7 +1,22 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { getWeeklyFlexTime, checkStreak, getWeekEnd, isInViewingWindow, isFirebaseConfigured } from '@/lib/flex-time';
+import { useEffect, useState, useCallback } from 'react';
+import {
+    getWeeklyFlexTime,
+    checkStreak,
+    getWeekEnd,
+    isInViewingWindow,
+    isFirebaseConfigured,
+    subscribeToDayPreferences,
+    updateDayPreference,
+    isDecisionLocked,
+    isVotingEnabled,
+    calculateWinningDay,
+    DayPreferenceData,
+    DayPreference,
+    KidName,
+    KIDS
+} from '@/lib/flex-time';
 import { WeeklyFlexTime } from '@/types';
 import FlexTimeBalance from '@/components/FlexTimeBalance';
 import WeeklyNotes from '@/components/WeeklyNotes';
@@ -14,6 +29,10 @@ export default function KidsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [timeUntilReset, setTimeUntilReset] = useState('');
+    const [dayPreferences, setDayPreferences] = useState<DayPreferenceData | null>(null);
+    const [locked, setLocked] = useState(false);
+    const [votingEnabled, setVotingEnabled] = useState(true);
+    const [updating, setUpdating] = useState<KidName | null>(null);
 
     useEffect(() => {
         async function loadData() {
@@ -64,6 +83,44 @@ export default function KidsPage() {
         const interval = setInterval(updateCountdown, 60000);
         return () => clearInterval(interval);
     }, []);
+
+    // Subscribe to day preferences (real-time updates)
+    useEffect(() => {
+        const unsubscribe = subscribeToDayPreferences((data) => {
+            setDayPreferences(data);
+        });
+
+        return () => unsubscribe();
+    }, []);
+
+    // Update lock status periodically
+    useEffect(() => {
+        const updateLockStatus = () => {
+            setLocked(isDecisionLocked());
+            setVotingEnabled(isVotingEnabled());
+        };
+
+        updateLockStatus();
+        // Check every minute
+        const interval = setInterval(updateLockStatus, 60000);
+        return () => clearInterval(interval);
+    }, []);
+
+    // Handle preference toggle
+    const handlePreferenceToggle = useCallback(async (kidName: KidName) => {
+        if (!dayPreferences || locked || !votingEnabled || updating) return;
+
+        const currentPref = dayPreferences.preferences[kidName];
+        const newPref: DayPreference = currentPref === 'saturday' ? 'sunday' : 'saturday';
+
+        setUpdating(kidName);
+        const result = await updateDayPreference(kidName, newPref);
+        setUpdating(null);
+
+        if (!result.success) {
+            console.error(result.message);
+        }
+    }, [dayPreferences, locked, votingEnabled, updating]);
 
     const inWindow = isInViewingWindow();
 
@@ -159,6 +216,76 @@ export default function KidsPage() {
                             <span className="time-value">Sat/Sun 10 AM - 12 PM</span>
                         </div>
                     </div>
+                </div>
+
+                {/* Day Preference Voting Section */}
+                <div className="day-preference-section">
+                    <h3>🗳️ When is Flex Time This Week?</h3>
+
+                    {dayPreferences && (
+                        <>
+                            {/* Show the decided day when locked */}
+                            {locked && (
+                                <div className="decided-day">
+                                    <span className="decided-label">This week&apos;s flex time is on:</span>
+                                    <span className="decided-value">
+                                        {calculateWinningDay(dayPreferences.preferences) === 'saturday' ? '🎮 Saturday' : '🎮 Sunday'}
+                                    </span>
+                                </div>
+                            )}
+
+                            {/* Show voting status */}
+                            {!locked && !votingEnabled && (
+                                <div className="voting-status locked">
+                                    Voting resumes when the week resets on Sunday at noon
+                                </div>
+                            )}
+
+                            {!locked && votingEnabled && (
+                                <div className="voting-status open">
+                                    Vote now! Decision locks Saturday at midnight.
+                                </div>
+                            )}
+
+                            {/* Kid toggles */}
+                            <div className="kid-toggles">
+                                {KIDS.map((kidName) => {
+                                    const preference = dayPreferences.preferences[kidName];
+                                    const isSaturday = preference === 'saturday';
+                                    const isDisabled = locked || !votingEnabled || updating === kidName;
+                                    const displayName = kidName.charAt(0).toUpperCase() + kidName.slice(1);
+
+                                    return (
+                                        <div key={kidName} className={`kid-toggle ${isDisabled ? 'disabled' : ''}`}>
+                                            <span className="kid-name">{displayName}</span>
+                                            <button
+                                                className={`day-toggle ${isSaturday ? 'saturday' : 'sunday'}`}
+                                                onClick={() => handlePreferenceToggle(kidName)}
+                                                disabled={isDisabled}
+                                                aria-label={`${displayName}'s preference: ${preference}`}
+                                            >
+                                                <span className={`toggle-option ${isSaturday ? 'active' : ''}`}>Sat</span>
+                                                <span className="toggle-slider"></span>
+                                                <span className={`toggle-option ${!isSaturday ? 'active' : ''}`}>Sun</span>
+                                            </button>
+                                            {updating === kidName && <span className="updating-indicator">...</span>}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Vote tally */}
+                            <div className="vote-tally">
+                                <span className="tally-item">
+                                    Saturday: {Object.values(dayPreferences.preferences).filter(p => p === 'saturday').length}
+                                </span>
+                                <span className="tally-divider">|</span>
+                                <span className="tally-item">
+                                    Sunday: {Object.values(dayPreferences.preferences).filter(p => p === 'sunday').length}
+                                </span>
+                            </div>
+                        </>
+                    )}
                 </div>
             </main>
         </div>
