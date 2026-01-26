@@ -243,7 +243,7 @@ export default function KidsPage() {
 
                             {!locked && votingEnabled && (
                                 <div className="voting-status open">
-                                    Vote now! Decision locks Saturday at midnight.
+                                    Vote now! Decision locks Friday at midnight.
                                 </div>
                             )}
 

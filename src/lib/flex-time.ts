@@ -371,20 +371,17 @@ export interface DayPreferenceData {
 export const KIDS = ['charlie', 'malcolm', 'henry'] as const;
 export type KidName = typeof KIDS[number];
 
-// Check if we're past Saturday midnight (decision is locked)
+// Check if we're past Friday midnight (decision is locked when Saturday begins)
 export function isDecisionLocked(date: Date = new Date()): boolean {
     const day = date.getDay();
     // Sunday is 0, Saturday is 6
-    // Decision locks at Saturday midnight (start of Sunday)
-    // So it's locked on Sunday (day === 0)
-    return day === 0;
+    // Decision locks at Saturday midnight (start of Saturday, i.e., Friday 11:59:59 PM -> Saturday 12:00:00 AM)
+    // So it's locked on Saturday (day === 6) or Sunday (day === 0)
+    return day === 6 || day === 0;
 }
 
 // Check if voting should be re-enabled (after Sunday 12 PM when week resets)
 export function isVotingEnabled(date: Date = new Date()): boolean {
-    const weekEnd = getWeekEnd(date);
-    // Voting is enabled when current time is after the week end (Sunday 12 PM)
-    // OR when it's not Sunday yet (Monday through Saturday)
     const day = date.getDay();
 
     if (day === 0) {
@@ -392,7 +389,11 @@ export function isVotingEnabled(date: Date = new Date()): boolean {
         const hours = date.getHours();
         return hours >= 12;
     }
-    // Monday through Saturday - voting is enabled
+    if (day === 6) {
+        // It's Saturday - voting is disabled (decision is locked)
+        return false;
+    }
+    // Monday through Friday - voting is enabled
     return true;
 }
 
