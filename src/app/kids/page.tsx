@@ -237,7 +237,7 @@ export default function KidsPage() {
                             {/* Show voting status */}
                             {!locked && !votingEnabled && (
                                 <div className="voting-status locked">
-                                    Voting resumes when the week resets on Sunday at noon
+                                    Voting opens Sunday at noon
                                 </div>
                             )}
 
