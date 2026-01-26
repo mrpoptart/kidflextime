@@ -45,14 +45,13 @@ export function getWeekEnd(date: Date = new Date()): Date {
     return weekEnd;
 }
 
-// Get the week ID for Firestore (e.g., "2026-W03")
+// Get the week ID for Firestore based on the Saturday start date (e.g., "2026-01-24")
 export function getWeekId(date: Date = new Date()): string {
     const weekStart = getWeekStart(date);
     const year = weekStart.getFullYear();
-    const startOfYear = new Date(year, 0, 1);
-    const days = Math.floor((weekStart.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000));
-    const weekNumber = Math.ceil((days + startOfYear.getDay() + 1) / 7);
-    return `${year}-W${weekNumber.toString().padStart(2, '0')}`;
+    const month = (weekStart.getMonth() + 1).toString().padStart(2, '0');
+    const day = weekStart.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 // Check if we're currently in the flex time viewing window (Sat/Sun 10am-12pm)
@@ -96,14 +95,24 @@ export async function getWeeklyFlexTime(): Promise<WeeklyFlexTime> {
 
         if (docSnap.exists()) {
             const data = docSnap.data();
+            const allEntries = data.entries.map((e: FlexTimeEntry & { timestamp: { toDate: () => Date } }) => ({
+                ...e,
+                timestamp: e.timestamp.toDate()
+            }));
+
+            // Filter entries to only include those within the current week boundaries
+            const entries = allEntries.filter(
+                (e: FlexTimeEntry) => e.timestamp >= weekStart && e.timestamp < weekEnd
+            );
+
+            // Recalculate balance from filtered entries
+            const balance = entries.reduce((sum: number, e: FlexTimeEntry) => sum + e.minutes, 0);
+
             return {
-                weekStart: data.weekStart.toDate(),
-                weekEnd: data.weekEnd.toDate(),
-                balance: data.balance,
-                entries: data.entries.map((e: FlexTimeEntry & { timestamp: { toDate: () => Date } }) => ({
-                    ...e,
-                    timestamp: e.timestamp.toDate()
-                })),
+                weekStart,
+                weekEnd,
+                balance,
+                entries,
                 lastUpdated: data.lastUpdated.toDate()
             };
         }
