@@ -25,23 +25,23 @@ import {
 export { MAX_FLEX_TIME_PER_WEEK, FLEX_TIME_INCREMENT, WEEKS_FOR_STREAK } from '@/types';
 export { isFirebaseConfigured } from './firebase';
 
-// Get the start of the current flex time week (Monday 12:00 AM)
+// Get the start of the current flex time week (Saturday 12:00 AM)
 export function getWeekStart(date: Date = new Date()): Date {
     const d = new Date(date);
     const day = d.getDay();
-    // Adjust so Monday is the first day (0), Sunday is 6
-    const diff = day === 0 ? -6 : 1 - day;
-    d.setDate(d.getDate() + diff);
+    // Week starts on Saturday. Calculate days since last Saturday.
+    // Sat(6)->0, Sun(0)->1, Mon(1)->2, Tue(2)->3, Wed(3)->4, Thu(4)->5, Fri(5)->6
+    const daysSinceSaturday = (day - 6 + 7) % 7;
+    d.setDate(d.getDate() - daysSinceSaturday);
     d.setHours(0, 0, 0, 0);
     return d;
 }
 
-// Get Sunday 12:00 PM (noon) when flex time resets
+// Get the end of the current flex time week (next Saturday 12:00 AM)
 export function getWeekEnd(date: Date = new Date()): Date {
     const weekStart = getWeekStart(date);
     const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekEnd.getDate() + 6); // Sunday
-    weekEnd.setHours(12, 0, 0, 0); // Noon
+    weekEnd.setDate(weekEnd.getDate() + 7); // Next Saturday
     return weekEnd;
 }
 
@@ -67,7 +67,7 @@ export function isInViewingWindow(date: Date = new Date()): boolean {
     return false;
 }
 
-// Check if flex time should be reset (after Sunday 12pm)
+// Check if flex time should be reset (new week starts Saturday)
 export function shouldResetFlexTime(lastWeekStart: Date, now: Date = new Date()): boolean {
     const currentWeekStart = getWeekStart(now);
     return lastWeekStart.getTime() < currentWeekStart.getTime();
@@ -371,31 +371,6 @@ export interface DayPreferenceData {
 export const KIDS = ['charlie', 'malcolm', 'henry'] as const;
 export type KidName = typeof KIDS[number];
 
-// Check if we're past Saturday midnight (decision is locked)
-export function isDecisionLocked(date: Date = new Date()): boolean {
-    const day = date.getDay();
-    // Sunday is 0, Saturday is 6
-    // Decision locks at Saturday midnight (start of Sunday)
-    // So it's locked on Sunday (day === 0)
-    return day === 0;
-}
-
-// Check if voting should be re-enabled (after Sunday 12 PM when week resets)
-export function isVotingEnabled(date: Date = new Date()): boolean {
-    const weekEnd = getWeekEnd(date);
-    // Voting is enabled when current time is after the week end (Sunday 12 PM)
-    // OR when it's not Sunday yet (Monday through Saturday)
-    const day = date.getDay();
-
-    if (day === 0) {
-        // It's Sunday - check if we're past noon (week has reset)
-        const hours = date.getHours();
-        return hours >= 12;
-    }
-    // Monday through Saturday - voting is enabled
-    return true;
-}
-
 // Calculate which day wins based on preferences
 export function calculateWinningDay(preferences: KidDayPreferences): DayPreference {
     const saturdayVotes = Object.values(preferences).filter(p => p === 'saturday').length;
@@ -456,22 +431,6 @@ export async function updateDayPreference(
         return {
             success: false,
             message: 'Firebase not configured'
-        };
-    }
-
-    // Check if voting is enabled
-    if (!isVotingEnabled()) {
-        return {
-            success: false,
-            message: 'Voting is locked until the week resets on Sunday at noon'
-        };
-    }
-
-    // Check if decision is already locked (Saturday midnight passed)
-    if (isDecisionLocked()) {
-        return {
-            success: false,
-            message: 'Decision is locked! The day has been decided.'
         };
     }
 
