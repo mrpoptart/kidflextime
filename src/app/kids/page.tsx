@@ -9,8 +9,6 @@ import {
     isFirebaseConfigured,
     subscribeToDayPreferences,
     updateDayPreference,
-    isDecisionLocked,
-    isVotingEnabled,
     calculateWinningDay,
     DayPreferenceData,
     DayPreference,
@@ -30,8 +28,6 @@ export default function KidsPage() {
     const [error, setError] = useState<string | null>(null);
     const [timeUntilReset, setTimeUntilReset] = useState('');
     const [dayPreferences, setDayPreferences] = useState<DayPreferenceData | null>(null);
-    const [locked, setLocked] = useState(false);
-    const [votingEnabled, setVotingEnabled] = useState(true);
     const [updating, setUpdating] = useState<KidName | null>(null);
 
     useEffect(() => {
@@ -93,22 +89,9 @@ export default function KidsPage() {
         return () => unsubscribe();
     }, []);
 
-    // Update lock status periodically
-    useEffect(() => {
-        const updateLockStatus = () => {
-            setLocked(isDecisionLocked());
-            setVotingEnabled(isVotingEnabled());
-        };
-
-        updateLockStatus();
-        // Check every minute
-        const interval = setInterval(updateLockStatus, 60000);
-        return () => clearInterval(interval);
-    }, []);
-
     // Handle preference toggle
     const handlePreferenceToggle = useCallback(async (kidName: KidName) => {
-        if (!dayPreferences || locked || !votingEnabled || updating) return;
+        if (!dayPreferences || updating) return;
 
         const currentPref = dayPreferences.preferences[kidName];
         const newPref: DayPreference = currentPref === 'saturday' ? 'sunday' : 'saturday';
@@ -120,7 +103,7 @@ export default function KidsPage() {
         if (!result.success) {
             console.error(result.message);
         }
-    }, [dayPreferences, locked, votingEnabled, updating]);
+    }, [dayPreferences, updating]);
 
     const inWindow = isInViewingWindow();
 
@@ -224,35 +207,24 @@ export default function KidsPage() {
 
                     {dayPreferences && (
                         <>
-                            {/* Show the decided day when locked */}
-                            {locked && (
-                                <div className="decided-day">
-                                    <span className="decided-label">This week&apos;s flex time is on:</span>
-                                    <span className="decided-value">
-                                        {calculateWinningDay(dayPreferences.preferences) === 'saturday' ? '🎮 Saturday' : '🎮 Sunday'}
-                                    </span>
-                                </div>
-                            )}
+                            {/* Show the current winning day */}
+                            <div className="decided-day">
+                                <span className="decided-label">This week&apos;s flex time is on:</span>
+                                <span className="decided-value">
+                                    {calculateWinningDay(dayPreferences.preferences) === 'saturday' ? '🎮 Saturday' : '🎮 Sunday'}
+                                </span>
+                            </div>
 
-                            {/* Show voting status */}
-                            {!locked && !votingEnabled && (
-                                <div className="voting-status locked">
-                                    Voting opens Sunday at noon
-                                </div>
-                            )}
-
-                            {!locked && votingEnabled && (
-                                <div className="voting-status open">
-                                    Vote now! Decision locks Friday at midnight.
-                                </div>
-                            )}
+                            <div className="voting-status open">
+                                Vote now! Decision locks Friday at midnight.
+                            </div>
 
                             {/* Kid toggles */}
                             <div className="kid-toggles">
                                 {KIDS.map((kidName) => {
                                     const preference = dayPreferences.preferences[kidName];
                                     const isSaturday = preference === 'saturday';
-                                    const isDisabled = locked || !votingEnabled || updating === kidName;
+                                    const isDisabled = updating === kidName;
                                     const displayName = kidName.charAt(0).toUpperCase() + kidName.slice(1);
 
                                     return (

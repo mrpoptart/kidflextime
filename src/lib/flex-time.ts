@@ -371,32 +371,6 @@ export interface DayPreferenceData {
 export const KIDS = ['charlie', 'malcolm', 'henry'] as const;
 export type KidName = typeof KIDS[number];
 
-// Check if we're past Friday midnight (decision is locked when Saturday begins)
-export function isDecisionLocked(date: Date = new Date()): boolean {
-    const day = date.getDay();
-    // Sunday is 0, Saturday is 6
-    // Decision locks at Saturday midnight (start of Saturday, i.e., Friday 11:59:59 PM -> Saturday 12:00:00 AM)
-    // So it's locked on Saturday (day === 6) or Sunday (day === 0)
-    return day === 6 || day === 0;
-}
-
-// Check if voting is enabled (voting opens Sunday 12 PM, locks Friday midnight)
-export function isVotingEnabled(date: Date = new Date()): boolean {
-    const day = date.getDay();
-
-    if (day === 0) {
-        // It's Sunday - voting opens after noon
-        const hours = date.getHours();
-        return hours >= 12;
-    }
-    if (day === 6) {
-        // It's Saturday - voting is locked (decision has been made)
-        return false;
-    }
-    // Monday through Friday - voting is enabled
-    return true;
-}
-
 // Calculate which day wins based on preferences
 export function calculateWinningDay(preferences: KidDayPreferences): DayPreference {
     const saturdayVotes = Object.values(preferences).filter(p => p === 'saturday').length;
@@ -457,22 +431,6 @@ export async function updateDayPreference(
         return {
             success: false,
             message: 'Firebase not configured'
-        };
-    }
-
-    // Check if voting is enabled
-    if (!isVotingEnabled()) {
-        return {
-            success: false,
-            message: 'Voting is locked until Sunday at noon'
-        };
-    }
-
-    // Check if decision is already locked (Saturday midnight passed)
-    if (isDecisionLocked()) {
-        return {
-            success: false,
-            message: 'Decision is locked! The day has been decided.'
         };
     }
 
