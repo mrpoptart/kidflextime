@@ -229,7 +229,7 @@ export default function KidsPage() {
                                 </div>
                             ) : (
                                 <div className="voting-status open">
-                                    Vote now! Decision locks Friday evening.
+                                    Vote now! Decision locks Friday at midnight.
                                 </div>
                             )}
 
