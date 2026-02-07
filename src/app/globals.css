@@ -1245,6 +1245,123 @@ h3 {
   opacity: 0.3;
 }
 
+/* ===== Last Week Summary ===== */
+.last-week-summary {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.25);
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+}
+
+.last-week-summary.loading-summary {
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.last-week-summary h3 {
+  color: var(--color-text);
+  margin-bottom: 1rem;
+}
+
+.last-week-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.last-week-day {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.last-week-day-label {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.last-week-day-value {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-accent);
+}
+
+.last-week-earned {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+}
+
+.last-week-earned-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.75rem;
+}
+
+.last-week-earned-label {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.last-week-earned-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.last-week-earned-max {
+  font-size: 0.85rem;
+  font-weight: 400;
+  -webkit-text-fill-color: var(--color-text-muted);
+}
+
+.last-week-progress-container {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.last-week-progress-bar {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-full);
+  transition: width 0.5s ease;
+}
+
+.last-week-progress-bar.maxed {
+  background: var(--gradient-success);
+}
+
+.last-week-maxed {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  background: var(--gradient-success);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===== Locked Banner ===== */
+.locked-banner {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-text-muted);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  font-size: 0.9rem;
+}
+
 /* Responsive adjustments for day preference */
 @media (max-width: 600px) {
   .kid-toggle {
@@ -1255,5 +1372,11 @@ h3 {
 
   .kid-name {
     font-size: 1rem;
+  }
+
+  .last-week-day {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
   }
 }

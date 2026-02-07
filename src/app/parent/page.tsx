@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { getWeeklyFlexTime, checkStreak, deleteFlexTimeEntry } from '@/lib/flex-time';
+import { getWeeklyFlexTime, checkStreak, deleteFlexTimeEntry, isWeekend } from '@/lib/flex-time';
 import { WeeklyFlexTime, FlexTimeEntry } from '@/types';
 import FlexTimeBalance from '@/components/FlexTimeBalance';
 import AddFlexTimeButton from '@/components/AddFlexTimeButton';
 import WeeklyNotes from '@/components/WeeklyNotes';
+import LastWeekSummary from '@/components/LastWeekSummary';
 import Link from 'next/link';
 
 export default function ParentPage() {
@@ -150,6 +151,9 @@ export default function ParentPage() {
                         🏆 {streak.streakCount}-week streak! Kids earned extra permissions!
                     </div>
                 )}
+
+                {/* Last Week Summary - shown on weekends */}
+                {isWeekend() && <LastWeekSummary />}
 
                 {loading ? (
                     <div className="loading-spinner">⏰</div>

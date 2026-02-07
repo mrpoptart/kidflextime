@@ -7,6 +7,7 @@ import {
     getWeekEnd,
     isInViewingWindow,
     isFirebaseConfigured,
+    isWeekend,
     subscribeToDayPreferences,
     updateDayPreference,
     calculateWinningDay,
@@ -19,6 +20,7 @@ import { WeeklyFlexTime } from '@/types';
 import FlexTimeBalance from '@/components/FlexTimeBalance';
 import WeeklyNotes from '@/components/WeeklyNotes';
 import StreakCelebration from '@/components/StreakCelebration';
+import LastWeekSummary from '@/components/LastWeekSummary';
 import Link from 'next/link';
 
 export default function KidsPage() {
@@ -106,6 +108,7 @@ export default function KidsPage() {
     }, [dayPreferences, updating]);
 
     const inWindow = isInViewingWindow();
+    const weekend = isWeekend();
 
     if (loading) {
         return (
@@ -175,6 +178,9 @@ export default function KidsPage() {
                     </div>
                 )}
 
+                {/* Last Week Summary - shown on weekends */}
+                {weekend && <LastWeekSummary />}
+
                 {flexTime && (
                     <>
                         <FlexTimeBalance balance={flexTime.balance} />
@@ -216,7 +222,7 @@ export default function KidsPage() {
                             </div>
 
                             <div className="voting-status open">
-                                Vote now! Decision locks Friday at midnight.
+                                Vote now! Votes reset every Saturday.
                             </div>
 
                             {/* Kid toggles */}
