@@ -66,6 +66,38 @@ export function isInViewingWindow(date: Date = new Date()): boolean {
     return false;
 }
 
+// Check if it's a weekend (Saturday or Sunday)
+export function isWeekend(date: Date = new Date()): boolean {
+    const day = date.getDay();
+    return day === 0 || day === 6; // Sunday (0) or Saturday (6)
+}
+
+// Check if the week is locked (Friday at 6 PM or later, or weekend)
+// On Friday night we lock voting and flex time additions for the current week
+export function isWeekLocked(date: Date = new Date()): boolean {
+    const day = date.getDay();
+    const hours = date.getHours();
+
+    // Weekend - the previous week is locked
+    if (day === 0 || day === 6) return true;
+
+    // Friday (5) at 6 PM or later
+    if (day === 5 && hours >= 18) return true;
+
+    return false;
+}
+
+// Get the previous week's ID (the Saturday before the current week start)
+export function getPreviousWeekId(date: Date = new Date()): string {
+    const weekStart = getWeekStart(date);
+    const prevWeekStart = new Date(weekStart);
+    prevWeekStart.setDate(prevWeekStart.getDate() - 7);
+    const year = prevWeekStart.getFullYear();
+    const month = (prevWeekStart.getMonth() + 1).toString().padStart(2, '0');
+    const day = prevWeekStart.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 // Check if flex time should be reset (new week starts Saturday)
 export function shouldResetFlexTime(lastWeekStart: Date, now: Date = new Date()): boolean {
     const currentWeekStart = getWeekStart(now);
@@ -136,6 +168,75 @@ export async function getWeeklyFlexTime(): Promise<WeeklyFlexTime> {
             entries: [],
             lastUpdated: new Date()
         };
+    }
+}
+
+// Get flex time data for a specific week by weekId
+export async function getWeeklyFlexTimeForWeek(weekId: string): Promise<WeeklyFlexTime> {
+    // Parse the weekId to get the week start date
+    const [year, month, day] = weekId.split('-').map(Number);
+    const weekStart = new Date(year, month - 1, day, 0, 0, 0, 0);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 7);
+
+    if (!db) {
+        return { weekStart, weekEnd, balance: 0, entries: [], lastUpdated: new Date() };
+    }
+
+    try {
+        const docRef = doc(db, 'flexTime', weekId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            const allEntries = data.entries.map((e: FlexTimeEntry & { timestamp: { toDate: () => Date } }) => ({
+                ...e,
+                timestamp: e.timestamp.toDate()
+            }));
+
+            const entries = allEntries.filter(
+                (e: FlexTimeEntry) => e.timestamp >= weekStart && e.timestamp < weekEnd
+            );
+
+            const balance = entries.reduce((sum: number, e: FlexTimeEntry) => sum + e.minutes, 0);
+
+            return { weekStart, weekEnd, balance, entries, lastUpdated: data.lastUpdated.toDate() };
+        }
+
+        return { weekStart, weekEnd, balance: 0, entries: [], lastUpdated: new Date() };
+    } catch (error) {
+        console.warn('Could not fetch flex time data for week:', error);
+        return { weekStart, weekEnd, balance: 0, entries: [], lastUpdated: new Date() };
+    }
+}
+
+// Get day preferences for a specific week by weekId
+export async function getDayPreferencesForWeek(weekId: string): Promise<DayPreferenceData> {
+    const defaultData: DayPreferenceData = {
+        weekId,
+        preferences: { charlie: 'saturday', malcolm: 'saturday', henry: 'saturday' },
+        lastUpdated: new Date()
+    };
+
+    if (!db) return defaultData;
+
+    try {
+        const docRef = doc(db, 'dayPreferences', weekId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            return {
+                weekId: data.weekId,
+                preferences: data.preferences,
+                lastUpdated: data.lastUpdated.toDate()
+            };
+        }
+
+        return defaultData;
+    } catch (error) {
+        console.warn('Could not fetch day preferences for week:', error);
+        return defaultData;
     }
 }
 

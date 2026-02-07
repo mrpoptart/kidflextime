@@ -7,6 +7,8 @@ import {
     getWeekEnd,
     isInViewingWindow,
     isFirebaseConfigured,
+    isWeekend,
+    isWeekLocked,
     subscribeToDayPreferences,
     updateDayPreference,
     calculateWinningDay,
@@ -19,6 +21,7 @@ import { WeeklyFlexTime } from '@/types';
 import FlexTimeBalance from '@/components/FlexTimeBalance';
 import WeeklyNotes from '@/components/WeeklyNotes';
 import StreakCelebration from '@/components/StreakCelebration';
+import LastWeekSummary from '@/components/LastWeekSummary';
 import Link from 'next/link';
 
 export default function KidsPage() {
@@ -106,6 +109,8 @@ export default function KidsPage() {
     }, [dayPreferences, updating]);
 
     const inWindow = isInViewingWindow();
+    const weekend = isWeekend();
+    const locked = isWeekLocked();
 
     if (loading) {
         return (
@@ -175,6 +180,9 @@ export default function KidsPage() {
                     </div>
                 )}
 
+                {/* Last Week Summary - shown on weekends */}
+                {weekend && <LastWeekSummary />}
+
                 {flexTime && (
                     <>
                         <FlexTimeBalance balance={flexTime.balance} />
@@ -215,16 +223,22 @@ export default function KidsPage() {
                                 </span>
                             </div>
 
-                            <div className="voting-status open">
-                                Vote now! Decision locks Friday at midnight.
-                            </div>
+                            {locked ? (
+                                <div className="voting-status locked">
+                                    Voting is locked for this week.
+                                </div>
+                            ) : (
+                                <div className="voting-status open">
+                                    Vote now! Decision locks Friday evening.
+                                </div>
+                            )}
 
                             {/* Kid toggles */}
                             <div className="kid-toggles">
                                 {KIDS.map((kidName) => {
                                     const preference = dayPreferences.preferences[kidName];
                                     const isSaturday = preference === 'saturday';
-                                    const isDisabled = updating === kidName;
+                                    const isDisabled = updating === kidName || locked;
                                     const displayName = kidName.charAt(0).toUpperCase() + kidName.slice(1);
 
                                     return (
