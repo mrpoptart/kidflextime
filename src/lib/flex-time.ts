@@ -72,16 +72,6 @@ export function isWeekend(date: Date = new Date()): boolean {
     return day === 0 || day === 6; // Sunday (0) or Saturday (6)
 }
 
-// Check if the week is locked (Saturday/Sunday only)
-// Friday ends at midnight (which is Saturday 00:00), so the lock coincides
-// with the week rollover to Saturday. During the weekend the previous week's
-// choices and gains are final.
-export function isWeekLocked(date: Date = new Date()): boolean {
-    const day = date.getDay();
-    // Saturday (6) or Sunday (0)
-    return day === 0 || day === 6;
-}
-
 // Get the previous week's ID (the Saturday before the current week start)
 export function getPreviousWeekId(date: Date = new Date()): string {
     const weekStart = getWeekStart(date);

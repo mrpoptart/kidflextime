@@ -8,7 +8,6 @@ import {
     isInViewingWindow,
     isFirebaseConfigured,
     isWeekend,
-    isWeekLocked,
     subscribeToDayPreferences,
     updateDayPreference,
     calculateWinningDay,
@@ -110,7 +109,6 @@ export default function KidsPage() {
 
     const inWindow = isInViewingWindow();
     const weekend = isWeekend();
-    const locked = isWeekLocked();
 
     if (loading) {
         return (
@@ -223,22 +221,16 @@ export default function KidsPage() {
                                 </span>
                             </div>
 
-                            {locked ? (
-                                <div className="voting-status locked">
-                                    Voting is locked for this week.
-                                </div>
-                            ) : (
-                                <div className="voting-status open">
-                                    Vote now! Decision locks Friday at midnight.
-                                </div>
-                            )}
+                            <div className="voting-status open">
+                                Vote now! Votes reset every Saturday.
+                            </div>
 
                             {/* Kid toggles */}
                             <div className="kid-toggles">
                                 {KIDS.map((kidName) => {
                                     const preference = dayPreferences.preferences[kidName];
                                     const isSaturday = preference === 'saturday';
-                                    const isDisabled = updating === kidName || locked;
+                                    const isDisabled = updating === kidName;
                                     const displayName = kidName.charAt(0).toUpperCase() + kidName.slice(1);
 
                                     return (

@@ -20,19 +20,21 @@ The app uses a **Saturday-to-Saturday week**:
 | Thursday  | 4        | Normal weekday                         |
 | Friday    | 5        | Last day of the week                   |
 
-### Locking rules
+### No locking
 
-- Choices (voting) and flex time gaining are **locked at Friday midnight** (i.e., Saturday 00:00 when the new week starts).
-- Friday midnight = Saturday 00:00. The lock coincides exactly with the week rollover.
-- On **Saturday and Sunday**, the previous week is locked and displayed as "Last Week's Results."
-- There is **no early Friday lock** — the full Friday (all 24 hours) is available for voting and earning.
+There is **NO locking of voting or flex time contributions at any point** in the week.
+Voting and adding flex time are always available, every day, including weekends.
+Do not add any locking, disabling, or gating of these features based on day of week or time.
 
 ### Weekend behavior
 
 On Saturday and Sunday, both Kids and Parent pages show **two sections**:
 
-1. **Last Week's Results** — the chosen flex time day and total time earned from the previous week
-2. **This Week** — the current (new) week's balance, voting, and flex time operations
+1. **Last Week's Results** — a read-only summary showing the chosen flex time day and total time earned from the previous week
+2. **This Week** — the normal current-week view with balance, voting, flex time additions, etc. (fully interactive, not locked)
+
+The Last Week's Results section is **only shown on weekends** (Saturday/Sunday).
+On weekdays (Monday–Friday), only the current week's section is shown.
 
 ### Time windows
 
@@ -43,8 +45,8 @@ On Saturday and Sunday, both Kids and Parent pages show **two sections**:
 
 - Three kids (Charlie, Malcolm, Henry) each vote for Saturday or Sunday
 - Majority wins; ties default to Saturday
-- Votes can be changed anytime **before Friday midnight**
-- On the weekend, voting for the new week is open but last week's votes are final
+- Votes can be changed **any day of the week**, including weekends
+- Votes reset with the week rollover on Saturday at midnight
 
 ## Tech Stack
 

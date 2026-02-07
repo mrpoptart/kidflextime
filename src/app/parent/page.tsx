@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { getWeeklyFlexTime, checkStreak, deleteFlexTimeEntry, isWeekend, isWeekLocked } from '@/lib/flex-time';
+import { getWeeklyFlexTime, checkStreak, deleteFlexTimeEntry, isWeekend } from '@/lib/flex-time';
 import { WeeklyFlexTime, FlexTimeEntry } from '@/types';
 import FlexTimeBalance from '@/components/FlexTimeBalance';
 import AddFlexTimeButton from '@/components/AddFlexTimeButton';
@@ -155,12 +155,6 @@ export default function ParentPage() {
                 {/* Last Week Summary - shown on weekends */}
                 {isWeekend() && <LastWeekSummary />}
 
-                {isWeekLocked() && (
-                    <div className="locked-banner">
-                        This week&apos;s flex time is locked. New week starts Saturday.
-                    </div>
-                )}
-
                 {loading ? (
                     <div className="loading-spinner">⏰</div>
                 ) : error ? (
@@ -169,12 +163,10 @@ export default function ParentPage() {
                     <>
                         <FlexTimeBalance balance={flexTime.balance} />
 
-                        {!isWeekLocked() && (
-                            <AddFlexTimeButton
-                                currentBalance={flexTime.balance}
-                                onFlexTimeAdded={loadFlexTime}
-                            />
-                        )}
+                        <AddFlexTimeButton
+                            currentBalance={flexTime.balance}
+                            onFlexTimeAdded={loadFlexTime}
+                        />
 
                         <WeeklyNotes entries={flexTime.entries} />
 
