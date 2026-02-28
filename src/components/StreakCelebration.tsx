@@ -5,9 +5,10 @@ import { useEffect, useState } from 'react';
 interface StreakCelebrationProps {
     streakCount: number;
     show: boolean;
+    onDismiss: () => void;
 }
 
-export default function StreakCelebration({ streakCount, show }: StreakCelebrationProps) {
+export default function StreakCelebration({ streakCount, show, onDismiss }: StreakCelebrationProps) {
     const [isAnimating, setIsAnimating] = useState(false);
 
     useEffect(() => {
@@ -19,8 +20,8 @@ export default function StreakCelebration({ streakCount, show }: StreakCelebrati
     if (!show) return null;
 
     return (
-        <div className={`streak-celebration ${isAnimating ? 'animate' : ''}`}>
-            <div className="celebration-content">
+        <div className={`streak-celebration ${isAnimating ? 'animate' : ''}`} onClick={onDismiss}>
+            <div className="celebration-content" onClick={(e) => e.stopPropagation()}>
                 <div className="trophy">🏆</div>
                 <h2 className="celebration-title">AMAZING STREAK!</h2>
                 <p className="streak-count">
@@ -29,6 +30,10 @@ export default function StreakCelebration({ streakCount, show }: StreakCelebrati
                 <p className="celebration-message">
                     You&apos;ve earned <strong>EXTRA PERMISSIONS!</strong>
                 </p>
+                <button className="celebration-dismiss" onClick={onDismiss}>
+                    Awesome! Let&apos;s Go! 🎉
+                </button>
+                <p className="celebration-tap-hint">Tap anywhere to close</p>
                 <div className="confetti">
                     {[...Array(20)].map((_, i) => (
                         <span key={i} className="confetti-piece" style={{
