@@ -92,12 +92,13 @@ export default function AddFlexTimeButton({ currentBalance, onFlexTimeAdded }: A
                         </p>
 
                         <label className="note-label">
-                            <span>Why are they earning this? (optional)</span>
+                            <span>Why are they earning this?</span>
                             <textarea
                                 value={note}
                                 onChange={(e) => setNote(e.target.value)}
                                 placeholder="e.g., Great job on homework!"
                                 rows={2}
+                                required
                             />
                         </label>
 
@@ -163,7 +164,7 @@ export default function AddFlexTimeButton({ currentBalance, onFlexTimeAdded }: A
                             <button
                                 className="confirm-button"
                                 onClick={handleAddFlexTime}
-                                disabled={loading}
+                                disabled={loading || !note.trim()}
                             >
                                 {loading ? 'Adding...' : 'Add Flex Time'}
                             </button>
