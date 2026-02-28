@@ -10,11 +10,13 @@ import {
     DayPreferenceData,
 } from '@/lib/flex-time';
 import { WeeklyFlexTime, MAX_FLEX_TIME_PER_WEEK } from '@/types';
+import WeeklyNotes from '@/components/WeeklyNotes';
 
 export default function LastWeekSummary() {
     const [lastWeekFlexTime, setLastWeekFlexTime] = useState<WeeklyFlexTime | null>(null);
     const [lastWeekPreferences, setLastWeekPreferences] = useState<DayPreferenceData | null>(null);
     const [loading, setLoading] = useState(true);
+    const [reflectionOpen, setReflectionOpen] = useState(false);
 
     useEffect(() => {
         async function loadLastWeekData() {
@@ -82,6 +84,21 @@ export default function LastWeekSummary() {
                     {isMaxed && (
                         <div className="last-week-maxed">MAX ACHIEVED!</div>
                     )}
+                </div>
+
+                {/* Reflection accordion */}
+                <div className="last-week-reflection">
+                    <button
+                        className={`last-week-reflection-toggle ${reflectionOpen ? 'open' : ''}`}
+                        onClick={() => setReflectionOpen(!reflectionOpen)}
+                        aria-expanded={reflectionOpen}
+                    >
+                        <span>🌟 Why We Earned It</span>
+                        <span className="last-week-reflection-arrow">{reflectionOpen ? '▲' : '▼'}</span>
+                    </button>
+                    <div className={`last-week-reflection-content ${reflectionOpen ? 'open' : ''}`}>
+                        <WeeklyNotes entries={lastWeekFlexTime.entries} emptyMessage="No flex time was added last week" />
+                    </div>
                 </div>
             </div>
         </div>
