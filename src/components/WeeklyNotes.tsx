@@ -4,6 +4,7 @@ import { FlexTimeEntry } from '@/types';
 
 interface WeeklyNotesProps {
     entries: FlexTimeEntry[];
+    onDeleteEntry?: (entry: FlexTimeEntry) => void;
 }
 
 function formatEntryTime(date: Date): string {
@@ -17,25 +18,43 @@ function formatEntryTime(date: Date): string {
     return `${day} ${displayHour}:${displayMin} ${ampm}`;
 }
 
-export default function WeeklyNotes({ entries }: WeeklyNotesProps) {
-    const notesWithContent = entries.filter(e => e.note && e.note.trim());
-
-    if (notesWithContent.length === 0) {
-        return null;
+export default function WeeklyNotes({ entries, onDeleteEntry }: WeeklyNotesProps) {
+    if (entries.length === 0) {
+        return (
+            <div className="weekly-notes">
+                <h3>🌟 Why We Earned It</h3>
+                <p className="no-notes">No flex time added yet this week</p>
+            </div>
+        );
     }
 
     return (
         <div className="weekly-notes">
             <h3>🌟 Why We Earned It</h3>
             <ul className="notes-list">
-                {notesWithContent.map((entry, index) => (
+                {entries.map((entry, index) => (
                     <li key={index} className="note-item">
-                        <span className="note-text">{entry.note}</span>
-                        <span className="note-meta">
-                            +{entry.minutes} min
-                            {entry.addedByName && ` by ${entry.addedByName}`}
-                            {' · '}{formatEntryTime(entry.timestamp)}
-                        </span>
+                        <div className="note-content">
+                            {entry.note && entry.note.trim() ? (
+                                <span className="note-text">{entry.note}</span>
+                            ) : (
+                                <span className="note-text note-text-empty">No reason provided</span>
+                            )}
+                            <span className="note-meta">
+                                +{entry.minutes} min
+                                {entry.addedByName && ` by ${entry.addedByName}`}
+                                {' · '}{formatEntryTime(entry.timestamp)}
+                            </span>
+                        </div>
+                        {onDeleteEntry && (
+                            <button
+                                className="delete-entry-btn"
+                                onClick={() => onDeleteEntry(entry)}
+                                title="Delete entry"
+                            >
+                                &times;
+                            </button>
+                        )}
                     </li>
                 ))}
             </ul>

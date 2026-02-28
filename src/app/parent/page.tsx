@@ -168,37 +168,7 @@ export default function ParentPage() {
                             onFlexTimeAdded={loadFlexTime}
                         />
 
-                        <WeeklyNotes entries={flexTime.entries} />
-
-                        <div className="history-section">
-                            <h3>This Week&apos;s Activity</h3>
-                            <ul className="activity-list">
-                                {flexTime.entries.length === 0 ? (
-                                    <li className="no-activity">No flex time added yet this week</li>
-                                ) : (
-                                    flexTime.entries.map((entry, index) => (
-                                        <li key={index} className="activity-item">
-                                            <div className="activity-details">
-                                                <span className="activity-time">
-                                                    {new Date(entry.timestamp).toLocaleString()}
-                                                </span>
-                                                <span className="activity-amount">+{entry.minutes} min</span>
-                                                {entry.addedByName && (
-                                                    <span className="activity-by">by {entry.addedByName}</span>
-                                                )}
-                                            </div>
-                                            <button
-                                                className="delete-entry-btn"
-                                                onClick={() => setEntryToDelete(entry)}
-                                                title="Delete entry"
-                                            >
-                                                &times;
-                                            </button>
-                                        </li>
-                                    ))
-                                )}
-                            </ul>
-                        </div>
+                        <WeeklyNotes entries={flexTime.entries} onDeleteEntry={setEntryToDelete} />
                     </>
                 )}
             </main>
