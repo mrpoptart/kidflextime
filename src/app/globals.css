@@ -1488,6 +1488,63 @@ h3 {
   background-clip: text;
 }
 
+.last-week-reflection {
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.last-week-reflection-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.last-week-reflection-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.last-week-reflection-toggle.open {
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.last-week-reflection-arrow {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  transition: transform 0.3s ease;
+}
+
+.last-week-reflection-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.last-week-reflection-content.open {
+  max-height: 2000px;
+}
+
+.last-week-reflection-content .weekly-notes {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  padding: 0.75rem 1rem;
+  margin: 0;
+  border: none;
+}
+
+.last-week-reflection-content .weekly-notes h3 {
+  display: none;
+}
+
 /* ===== Locked Banner ===== */
 .locked-banner {
   background: rgba(255, 255, 255, 0.05);

@@ -5,6 +5,7 @@ import { FlexTimeEntry } from '@/types';
 interface WeeklyNotesProps {
     entries: FlexTimeEntry[];
     onDeleteEntry?: (entry: FlexTimeEntry) => void;
+    emptyMessage?: string;
 }
 
 function formatEntryTime(date: Date): string {
@@ -18,12 +19,12 @@ function formatEntryTime(date: Date): string {
     return `${day} ${displayHour}:${displayMin} ${ampm}`;
 }
 
-export default function WeeklyNotes({ entries, onDeleteEntry }: WeeklyNotesProps) {
+export default function WeeklyNotes({ entries, onDeleteEntry, emptyMessage }: WeeklyNotesProps) {
     if (entries.length === 0) {
         return (
             <div className="weekly-notes">
                 <h3>🌟 Why We Earned It</h3>
-                <p className="no-notes">No flex time added yet this week</p>
+                <p className="no-notes">{emptyMessage || 'No flex time added yet this week'}</p>
             </div>
         );
     }
