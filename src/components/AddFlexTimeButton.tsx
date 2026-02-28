@@ -1,12 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { addFlexTime, FLEX_TIME_INCREMENT, MAX_FLEX_TIME_PER_WEEK } from '@/lib/flex-time';
+import { addFlexTime, getWeekId, FLEX_TIME_INCREMENT, MAX_FLEX_TIME_PER_WEEK } from '@/lib/flex-time';
 import { useAuth } from '@/lib/auth-context';
 
 interface AddFlexTimeButtonProps {
     currentBalance: number;
     onFlexTimeAdded: () => void;
+}
+
+function formatLocalDateTime(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
 export default function AddFlexTimeButton({ currentBalance, onFlexTimeAdded }: AddFlexTimeButtonProps) {
@@ -15,8 +24,17 @@ export default function AddFlexTimeButton({ currentBalance, onFlexTimeAdded }: A
     const [note, setNote] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
+    const [useCustomDate, setUseCustomDate] = useState(false);
+    const [customDateTime, setCustomDateTime] = useState('');
 
     const isMaxed = currentBalance >= MAX_FLEX_TIME_PER_WEEK;
+
+    const handleOpen = () => {
+        if (isMaxed) return;
+        setIsOpen(true);
+        setUseCustomDate(false);
+        setCustomDateTime(formatLocalDateTime(new Date()));
+    };
 
     const handleAddFlexTime = async () => {
         if (!user || !userProfile) return;
@@ -25,11 +43,13 @@ export default function AddFlexTimeButton({ currentBalance, onFlexTimeAdded }: A
         setMessage('');
 
         try {
-            const result = await addFlexTime(user.uid, userProfile.name, note || undefined);
+            const targetDate = useCustomDate ? new Date(customDateTime) : undefined;
+            const result = await addFlexTime(user.uid, userProfile.name, note || undefined, targetDate);
             setMessage(result.message);
 
             if (result.success) {
                 setNote('');
+                setUseCustomDate(false);
                 setIsOpen(false);
                 onFlexTimeAdded();
             }
@@ -41,12 +61,15 @@ export default function AddFlexTimeButton({ currentBalance, onFlexTimeAdded }: A
         }
     };
 
+    const customDate = useCustomDate && customDateTime ? new Date(customDateTime) : null;
+    const isBackdated = customDate ? getWeekId(customDate) !== getWeekId() : false;
+
     return (
         <div className="add-flex-time">
             {!isOpen ? (
                 <button
                     className={`add-button ${isMaxed ? 'disabled' : ''}`}
-                    onClick={() => !isMaxed && setIsOpen(true)}
+                    onClick={handleOpen}
                     disabled={isMaxed}
                 >
                     {isMaxed ? '🎉 Max Reached!' : `+ Add ${FLEX_TIME_INCREMENT} Minutes`}
@@ -69,6 +92,33 @@ export default function AddFlexTimeButton({ currentBalance, onFlexTimeAdded }: A
                             />
                         </label>
 
+                        <div className="datetime-picker-section">
+                            <label className="datetime-toggle">
+                                <input
+                                    type="checkbox"
+                                    checked={useCustomDate}
+                                    onChange={(e) => setUseCustomDate(e.target.checked)}
+                                />
+                                <span>Change date & time</span>
+                            </label>
+
+                            {useCustomDate && (
+                                <div className="datetime-input-wrapper">
+                                    <input
+                                        type="datetime-local"
+                                        value={customDateTime}
+                                        onChange={(e) => setCustomDateTime(e.target.value)}
+                                        className="datetime-input"
+                                    />
+                                    {isBackdated && (
+                                        <p className="datetime-week-info">
+                                            This will be added to week of {getWeekId(customDate!)}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
                         {message && <p className="message">{message}</p>}
 
                         <div className="modal-buttons">
@@ -78,6 +128,7 @@ export default function AddFlexTimeButton({ currentBalance, onFlexTimeAdded }: A
                                     setIsOpen(false);
                                     setNote('');
                                     setMessage('');
+                                    setUseCustomDate(false);
                                 }}
                                 disabled={loading}
                             >

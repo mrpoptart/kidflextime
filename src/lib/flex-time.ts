@@ -226,10 +226,12 @@ export async function getDayPreferencesForWeek(weekId: string): Promise<DayPrefe
 }
 
 // Add flex time (10 minutes)
+// targetDate allows backdating entries to a specific date/time (e.g., for a previous week)
 export async function addFlexTime(
     userId: string,
     userName: string,
-    note?: string
+    note?: string,
+    targetDate?: Date
 ): Promise<{ success: boolean; message: string; newBalance: number }> {
     if (!db) {
         return {
@@ -239,9 +241,10 @@ export async function addFlexTime(
         };
     }
 
-    const weekId = getWeekId();
-    const weekStart = getWeekStart();
-    const weekEnd = getWeekEnd();
+    const entryTimestamp = targetDate || new Date();
+    const weekId = getWeekId(entryTimestamp);
+    const weekStart = getWeekStart(entryTimestamp);
+    const weekEnd = getWeekEnd(entryTimestamp);
 
     const docRef = doc(db, 'flexTime', weekId);
     const docSnap = await getDoc(docRef);
@@ -267,7 +270,7 @@ export async function addFlexTime(
         minutes: FLEX_TIME_INCREMENT,
         addedBy: userId,
         addedByName: userName,
-        timestamp: new Date(),
+        timestamp: entryTimestamp,
         ...(note && { note })  // Only include note if it has a value
     };
 
