@@ -1,12 +1,23 @@
 'use client';
 
-import { useState } from 'react';
-import { addFlexTime, FLEX_TIME_INCREMENT, MAX_FLEX_TIME_PER_WEEK } from '@/lib/flex-time';
+import { useRef, useState } from 'react';
+import { addFlexTime, getWeekId, FLEX_TIME_INCREMENT, MAX_FLEX_TIME_PER_WEEK } from '@/lib/flex-time';
 import { useAuth } from '@/lib/auth-context';
 
 interface AddFlexTimeButtonProps {
     currentBalance: number;
     onFlexTimeAdded: () => void;
+}
+
+function formatDisplayDateTime(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+    });
 }
 
 export default function AddFlexTimeButton({ currentBalance, onFlexTimeAdded }: AddFlexTimeButtonProps) {
@@ -15,8 +26,16 @@ export default function AddFlexTimeButton({ currentBalance, onFlexTimeAdded }: A
     const [note, setNote] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
+    const [customDateTime, setCustomDateTime] = useState('');
+    const dateInputRef = useRef<HTMLInputElement>(null);
 
     const isMaxed = currentBalance >= MAX_FLEX_TIME_PER_WEEK;
+
+    const handleOpen = () => {
+        if (isMaxed) return;
+        setIsOpen(true);
+        setCustomDateTime('');
+    };
 
     const handleAddFlexTime = async () => {
         if (!user || !userProfile) return;
@@ -25,11 +44,13 @@ export default function AddFlexTimeButton({ currentBalance, onFlexTimeAdded }: A
         setMessage('');
 
         try {
-            const result = await addFlexTime(user.uid, userProfile.name, note || undefined);
+            const targetDate = customDateTime ? new Date(customDateTime) : undefined;
+            const result = await addFlexTime(user.uid, userProfile.name, note || undefined, targetDate);
             setMessage(result.message);
 
             if (result.success) {
                 setNote('');
+                setCustomDateTime('');
                 setIsOpen(false);
                 onFlexTimeAdded();
             }
@@ -41,12 +62,23 @@ export default function AddFlexTimeButton({ currentBalance, onFlexTimeAdded }: A
         }
     };
 
+    const handleDateButtonClick = () => {
+        dateInputRef.current?.showPicker();
+    };
+
+    const handleClearDate = () => {
+        setCustomDateTime('');
+    };
+
+    const customDate = customDateTime ? new Date(customDateTime) : null;
+    const isBackdated = customDate ? getWeekId(customDate) !== getWeekId() : false;
+
     return (
         <div className="add-flex-time">
             {!isOpen ? (
                 <button
                     className={`add-button ${isMaxed ? 'disabled' : ''}`}
-                    onClick={() => !isMaxed && setIsOpen(true)}
+                    onClick={handleOpen}
                     disabled={isMaxed}
                 >
                     {isMaxed ? '🎉 Max Reached!' : `+ Add ${FLEX_TIME_INCREMENT} Minutes`}
@@ -69,6 +101,50 @@ export default function AddFlexTimeButton({ currentBalance, onFlexTimeAdded }: A
                             />
                         </label>
 
+                        <div className="datetime-picker-section">
+                            <div className="datetime-row">
+                                {customDateTime ? (
+                                    <span className="datetime-display">
+                                        {formatDisplayDateTime(customDateTime)}
+                                    </span>
+                                ) : (
+                                    <span className="datetime-placeholder">Specify a date</span>
+                                )}
+                                <div className="datetime-actions">
+                                    {customDateTime && (
+                                        <button
+                                            type="button"
+                                            className="datetime-clear-btn"
+                                            onClick={handleClearDate}
+                                            title="Clear date"
+                                        >
+                                            ✕
+                                        </button>
+                                    )}
+                                    <button
+                                        type="button"
+                                        className="datetime-picker-btn"
+                                        onClick={handleDateButtonClick}
+                                        title="Pick date and time"
+                                    >
+                                        ⌚
+                                    </button>
+                                </div>
+                                <input
+                                    ref={dateInputRef}
+                                    type="datetime-local"
+                                    value={customDateTime}
+                                    onChange={(e) => setCustomDateTime(e.target.value)}
+                                    className="datetime-input-hidden"
+                                />
+                            </div>
+                            {isBackdated && (
+                                <p className="datetime-week-info">
+                                    This will be added to week of {getWeekId(customDate!)}
+                                </p>
+                            )}
+                        </div>
+
                         {message && <p className="message">{message}</p>}
 
                         <div className="modal-buttons">
@@ -78,6 +154,7 @@ export default function AddFlexTimeButton({ currentBalance, onFlexTimeAdded }: A
                                     setIsOpen(false);
                                     setNote('');
                                     setMessage('');
+                                    setCustomDateTime('');
                                 }}
                                 disabled={loading}
                             >
