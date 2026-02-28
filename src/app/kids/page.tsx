@@ -26,6 +26,7 @@ import Link from 'next/link';
 export default function KidsPage() {
     const [flexTime, setFlexTime] = useState<WeeklyFlexTime | null>(null);
     const [streak, setStreak] = useState({ hasStreak: false, streakCount: 0 });
+    const [celebrationDismissed, setCelebrationDismissed] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [timeUntilReset, setTimeUntilReset] = useState('');
@@ -164,7 +165,7 @@ export default function KidsPage() {
 
     return (
         <div className="kids-page">
-            <StreakCelebration show={streak.hasStreak} streakCount={streak.streakCount} />
+            <StreakCelebration show={streak.hasStreak && !celebrationDismissed} streakCount={streak.streakCount} onDismiss={() => setCelebrationDismissed(true)} />
 
             <header className="kids-header">
                 <Link href="/" className="back-link">← Home</Link>

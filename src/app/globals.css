@@ -957,6 +957,43 @@ h3 {
   background-clip: text;
 }
 
+.celebration-dismiss {
+  margin-top: 1.5rem;
+  padding: 1rem 2.5rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--gradient-success);
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  animation: pulse-glow 2s ease-in-out infinite;
+  transition: transform 0.15s ease;
+}
+
+.celebration-dismiss:hover {
+  transform: scale(1.05);
+}
+
+.celebration-dismiss:active {
+  transform: scale(0.97);
+}
+
+.celebration-tap-hint {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(78, 205, 196, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(78, 205, 196, 0.8);
+  }
+}
+
 .confetti {
   position: absolute;
   inset: 0;
