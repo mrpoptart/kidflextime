@@ -205,6 +205,15 @@ h3 {
   box-shadow: 0 0 40px rgba(102, 126, 234, 0.4);
 }
 
+.contract-card {
+  background: linear-gradient(135deg, rgba(243, 156, 18, 0.2) 0%, rgba(230, 126, 34, 0.2) 100%);
+  border: 1px solid rgba(243, 156, 18, 0.3);
+}
+
+.contract-card:hover {
+  box-shadow: 0 0 40px rgba(243, 156, 18, 0.4);
+}
+
 .card-icon {
   font-size: 3rem;
   margin-bottom: 1rem;
@@ -250,11 +259,33 @@ h3 {
   background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
 }
 
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.contract-link {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+  font-size: 0.9rem;
+  margin-left: auto;
+}
+
+.contract-link:hover {
+  background: var(--color-card);
+  color: var(--color-text);
+}
+
 .kids-header {
   display: flex;
   align-items: center;
   gap: 1rem;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
 }
 
 .kids-header h1 {
@@ -1573,4 +1604,77 @@ h3 {
     gap: 0.5rem;
     text-align: center;
   }
+}
+
+/* ===== Contract Page ===== */
+.contract-page {
+  min-height: 100vh;
+  padding: 1.5rem;
+  background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.contract-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  animation: scale-in 0.5s ease-out;
+}
+
+.contract-icon {
+  font-size: 4rem;
+  margin-bottom: 0.5rem;
+}
+
+.contract-header h1 {
+  background: linear-gradient(135deg, #f39c12, #e67e22);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.contract-subtitle {
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+}
+
+.contract-section {
+  background: var(--color-card);
+  padding: 1.5rem 2rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.5rem;
+}
+
+.contract-section h2 {
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  color: var(--color-text);
+}
+
+.contract-section p {
+  color: var(--color-text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.contract-section ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0;
+}
+
+.contract-section li {
+  color: var(--color-text-muted);
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.contract-section li::before {
+  content: "•";
+  position: absolute;
+  left: 0.25rem;
+  color: #f39c12;
 }

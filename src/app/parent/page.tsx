@@ -88,7 +88,10 @@ export default function ParentPage() {
         return (
             <div className="parent-page">
                 <header className="parent-header">
-                    <Link href="/" className="back-link">← Home</Link>
+                    <div className="header-nav">
+                        <Link href="/" className="back-link">← Home</Link>
+                        <Link href="/contract" className="contract-link">📜 The Contract</Link>
+                    </div>
                     <h1>👨‍👩‍👧‍👦 Parent Setup</h1>
                 </header>
                 <main className="parent-main">
@@ -106,7 +109,10 @@ export default function ParentPage() {
         return (
             <div className="parent-page auth">
                 <header className="parent-header">
-                    <Link href="/" className="back-link">← Home</Link>
+                    <div className="header-nav">
+                        <Link href="/" className="back-link">← Home</Link>
+                        <Link href="/contract" className="contract-link">📜 The Contract</Link>
+                    </div>
                     <h1>👨‍👩‍👧‍👦 Parent Login</h1>
                 </header>
 
@@ -136,7 +142,10 @@ export default function ParentPage() {
     return (
         <div className="parent-page dashboard">
             <header className="parent-header">
-                <Link href="/" className="back-link">← Home</Link>
+                <div className="header-nav">
+                    <Link href="/" className="back-link">← Home</Link>
+                    <Link href="/contract" className="contract-link">📜 The Contract</Link>
+                </div>
                 <div className="user-info">
                     <span>Hi, {userProfile?.name || user.displayName || 'Parent'}!</span>
                     <button onClick={signOut} className="sign-out-btn">Sign Out</button>

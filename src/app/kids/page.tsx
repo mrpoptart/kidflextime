@@ -125,7 +125,10 @@ export default function KidsPage() {
         return (
             <div className="kids-page">
                 <header className="kids-header">
-                    <Link href="/" className="back-link">← Home</Link>
+                    <div className="header-nav">
+                        <Link href="/" className="back-link">← Home</Link>
+                        <Link href="/contract" className="contract-link">📜 The Contract</Link>
+                    </div>
                     <h1>🎮 Your Flex Time</h1>
                 </header>
                 <main className="kids-main">
@@ -168,7 +171,10 @@ export default function KidsPage() {
             <StreakCelebration show={streak.hasStreak && !celebrationDismissed} streakCount={streak.streakCount} onDismiss={() => setCelebrationDismissed(true)} />
 
             <header className="kids-header">
-                <Link href="/" className="back-link">← Home</Link>
+                <div className="header-nav">
+                    <Link href="/" className="back-link">← Home</Link>
+                    <Link href="/contract" className="contract-link">📜 The Contract</Link>
+                </div>
                 <h1>🎮 Your Flex Time</h1>
             </header>
 
