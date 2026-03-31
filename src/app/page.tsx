@@ -23,6 +23,12 @@ export default function Home() {
           <h2>Parent Login</h2>
           <p>Add flex time rewards</p>
         </Link>
+
+        <Link href="/contract" className="nav-card contract-card">
+          <div className="card-icon">📜</div>
+          <h2>The Contract</h2>
+          <p>Screen time rules &amp; agreement</p>
+        </Link>
       </div>
 
       <div className="info-box">
