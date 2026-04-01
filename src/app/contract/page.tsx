@@ -21,7 +21,7 @@ export default function ContractPage() {
 
             <section className="contract-section">
                 <h2>✅ Required Tasks Before Screen Time</h2>
-                <p>All of the following must be completed before any screens are touched:</p>
+                <p>All of the following must be completed <strong>by everyone</strong> before any screens are touched. If one person hasn&apos;t finished, nobody gets screen time:</p>
                 <ul>
                     <li>Teeth must be brushed and flossed</li>
                     <li>The projector room must be clean</li>
@@ -37,6 +37,7 @@ export default function ContractPage() {
                 <h2>📏 Screen Time Rules</h2>
                 <ul>
                     <li>All chores must be done before the screens are touched</li>
+                    <li><strong>All kids must complete their chores before anyone gets screen time.</strong> You succeed together or you fail together &mdash; no one plays until everyone is done.</li>
                     <li>Everyone goes on a walk</li>
                     <li>Parents are required to be helpful and not adversarial (no devil&apos;s bargains)</li>
                 </ul>
