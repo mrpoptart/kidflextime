@@ -12,7 +12,7 @@ export default function ContractPage() {
             </div>
 
             <section className="contract-section">
-                <h2>📅 Screen Time Schedule</h2>
+                <h2><span className="section-emoji">📅</span> Screen Time Schedule</h2>
                 <ul>
                     <li><strong>Daily Screen Time:</strong> 7:30 PM &ndash; 9:30 PM, every day of the week</li>
                     <li><strong>Flex Time:</strong> 10:00 AM &ndash; 12:00 PM on either Saturday or Sunday, decided by a popular vote the Friday before</li>
@@ -20,7 +20,7 @@ export default function ContractPage() {
             </section>
 
             <section className="contract-section">
-                <h2>✅ Required Tasks Before Screen Time</h2>
+                <h2><span className="section-emoji">✅</span> Required Tasks Before Screen Time</h2>
                 <p>All of the following must be completed <strong>by everyone</strong> before any screens are touched. If one person hasn&apos;t finished, nobody gets screen time:</p>
                 <ul>
                     <li>Teeth must be brushed and flossed</li>
@@ -34,7 +34,7 @@ export default function ContractPage() {
             </section>
 
             <section className="contract-section">
-                <h2>📏 Screen Time Rules</h2>
+                <h2><span className="section-emoji">📏</span> Screen Time Rules</h2>
                 <ul>
                     <li>All chores must be done before the screens are touched</li>
                     <li><strong>All kids must complete their chores before anyone gets screen time.</strong> You succeed together or you fail together &mdash; no one plays until everyone is done.</li>
@@ -44,7 +44,7 @@ export default function ContractPage() {
             </section>
 
             <section className="contract-section">
-                <h2>⭐ Flex Time Rules</h2>
+                <h2><span className="section-emoji">⭐</span> Flex Time Rules</h2>
                 <ul>
                     <li><strong>10 minutes</strong> of flex time for each bonus</li>
                     <li>All flex time is <strong>shared</strong> between all children</li>
