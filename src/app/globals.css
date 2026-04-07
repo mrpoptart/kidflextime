@@ -1653,6 +1653,10 @@ h3 {
   color: var(--color-text);
 }
 
+.contract-section h2 .section-emoji {
+  margin-right: 0.5rem;
+}
+
 .contract-section p {
   color: var(--color-text-muted);
   margin-bottom: 0.75rem;
