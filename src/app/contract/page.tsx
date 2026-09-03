@@ -20,6 +20,7 @@ export default function ContractPage() {
                     <li>If a chore is not done, the parent <strong>recommends the correction</strong>. The kid finishes that chore as quickly as possible and <strong>asks for a re-evaluation</strong>.</li>
                 </ol>
                 <p><strong>The clock does not stop for fixes.</strong> Every minute spent redoing a chore is a minute of screen time gone. That is on purpose &mdash; plan ahead and do the work right the first time, and you keep the whole two hours.</p>
+                <p><strong>There is no verification without the timer running.</strong> A parent cannot look things over &quot;just to check&quot; &mdash; no practice runs, no previews, no peeking before the clock starts. Every check, including a re-evaluation, happens on the running timer. Once you ask, the clock is going.</p>
             </section>
 
             <section className="contract-section">

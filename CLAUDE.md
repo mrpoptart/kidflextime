@@ -38,7 +38,7 @@ On weekdays (Monday–Friday), only the current week's section is shown.
 
 ### Time windows
 
-- **Daily screen time:** There is no fixed start time. A kid asks a parent for screen time; the parent begins verifying chores as soon as they are able, and the **2-hour timer starts the moment verification begins**. If a chore is incomplete, the parent recommends a correction and the kid asks for re-evaluation — **the timer keeps running during fixes**, by design, so corrections eat into screen time.
+- **Daily screen time:** There is no fixed start time. A kid asks a parent for screen time; the parent begins verifying chores as soon as they are able, and the **2-hour timer starts the moment verification begins**. If a chore is incomplete, the parent recommends a correction and the kid asks for re-evaluation — **the timer keeps running during fixes**, by design, so corrections eat into screen time. There is **no verification without the timer running** — no practice checks or previews; every check, re-evaluations included, happens on the running clock.
 - **Screen time cutoff:** 8:30 PM on school nights, 9:30 PM on non-school nights. The 2 hours never runs past the cutoff, so a late verification means less than the full 2 hours.
 - **Flex time viewing window:** Saturday or Sunday, 10:00 AM – 12:00 PM (based on the winning vote)
 
