@@ -15,11 +15,11 @@ export default function ContractPage() {
                 <h2><span className="section-emoji">🎮</span> How Screen Time Works</h2>
                 <ol>
                     <li>A kid <strong>asks a parent for screen time</strong>.</li>
-                    <li>The parent <strong>verifies the chores as soon as they are able</strong>.</li>
-                    <li>If every chore is done, the <strong>2-hour timer starts</strong> and games can be played.</li>
+                    <li>The parent starts checking chores as soon as they are able. <strong>The 2-hour timer starts the moment verification begins.</strong></li>
+                    <li>If every chore is done, games can be played for whatever is left on the timer.</li>
                     <li>If a chore is not done, the parent <strong>recommends the correction</strong>. The kid finishes that chore as quickly as possible and <strong>asks for a re-evaluation</strong>.</li>
                 </ol>
-                <p>The timer starts <strong>when the chores are verified</strong> &mdash; not when you asked, and not while a chore is still being fixed.</p>
+                <p><strong>The clock does not stop for fixes.</strong> Every minute spent redoing a chore is a minute of screen time gone. That is on purpose &mdash; plan ahead and do the work right the first time, and you keep the whole two hours.</p>
             </section>
 
             <section className="contract-section">
@@ -28,12 +28,12 @@ export default function ContractPage() {
                     <li><strong>School nights</strong> (a night before a school day): screens off at <strong>8:30 PM</strong></li>
                     <li><strong>Non-school nights</strong> (a night before a day off): screens off at <strong>9:30 PM</strong></li>
                 </ul>
-                <p>The 2 hours never runs past the cutoff, so <strong>a late start means less screen time</strong>:</p>
+                <p>The 2 hours never runs past the cutoff, so <strong>asking late means less screen time</strong>:</p>
                 <ul>
-                    <li>Verified after <strong>6:30 PM on a school night</strong> &rarr; less than 2 hours</li>
-                    <li>Verified after <strong>7:30 PM on a non-school night</strong> &rarr; less than 2 hours</li>
+                    <li>Verification starting after <strong>6:30 PM on a school night</strong> &rarr; less than 2 hours</li>
+                    <li>Verification starting after <strong>7:30 PM on a non-school night</strong> &rarr; less than 2 hours</li>
                 </ul>
-                <p>Getting chores done early is the only way to get the full two hours.</p>
+                <p>Asking early with the chores already done is the only way to get the full two hours.</p>
             </section>
 
             <section className="contract-section">

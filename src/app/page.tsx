@@ -34,7 +34,7 @@ export default function Home() {
       <div className="info-box">
         <h3>📅 Screen Time Rules</h3>
         <ul>
-          <li><strong>Daily:</strong> 2 hours, starting when a parent checks chores</li>
+          <li><strong>Daily:</strong> 2 hours, starting when a parent begins checking chores</li>
           <li><strong>Screens off:</strong> 8:30 PM school nights, 9:30 PM otherwise</li>
           <li><strong>Flex Time:</strong> Saturdays & Sundays, 10 AM - 12 PM</li>
           <li><strong>Max per week:</strong> 2 hours of flex time</li>
