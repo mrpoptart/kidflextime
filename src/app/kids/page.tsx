@@ -143,13 +143,14 @@ export default function KidsPage() {
                         <div className="time-cards">
                             <div className="time-card">
                                 <span className="time-label">Daily</span>
-                                <span className="time-value">5:30 - 7:30 PM</span>
+                                <span className="time-value">2 hrs after chores</span>
                             </div>
                             <div className="time-card">
                                 <span className="time-label">Flex Time</span>
                                 <span className="time-value">Sat/Sun 10 AM - 12 PM</span>
                             </div>
                         </div>
+                        <p className="time-note">Your 2 hours start when a parent checks your chores. Screens off at 8:30 PM on school nights, 9:30 PM on other nights.</p>
                     </div>
                 </main>
             </div>
@@ -205,13 +206,14 @@ export default function KidsPage() {
                     <div className="time-cards">
                         <div className="time-card">
                             <span className="time-label">Daily</span>
-                            <span className="time-value">5:30 - 7:30 PM</span>
+                            <span className="time-value">2 hrs after chores</span>
                         </div>
                         <div className="time-card">
                             <span className="time-label">Flex Time</span>
                             <span className="time-value">Sat/Sun 10 AM - 12 PM</span>
                         </div>
                     </div>
+                    <p className="time-note">Your 2 hours start when a parent checks your chores. Screens off at 8:30 PM on school nights, 9:30 PM on other nights.</p>
                 </div>
 
                 {/* Day Preference Voting Section */}

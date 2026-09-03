@@ -367,6 +367,13 @@ h3 {
   color: var(--color-accent);
 }
 
+.time-note {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
 /* ===== Parent Page ===== */
 .parent-page {
   min-height: 100vh;
@@ -1681,4 +1688,28 @@ h3 {
   position: absolute;
   left: 0.25rem;
   color: #f39c12;
+}
+
+.contract-section ol {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0;
+  counter-reset: contract-step;
+}
+
+.contract-section ol li {
+  counter-increment: contract-step;
+  padding-left: 2rem;
+}
+
+.contract-section ol li::before {
+  content: counter(contract-step) ".";
+  font-weight: 700;
+}
+
+.contract-section ul + p,
+.contract-section ol + p {
+  margin-top: 0.75rem;
 }
