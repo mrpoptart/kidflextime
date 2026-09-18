@@ -21,6 +21,7 @@ import FlexTimeBalance from '@/components/FlexTimeBalance';
 import WeeklyNotes from '@/components/WeeklyNotes';
 import StreakCelebration from '@/components/StreakCelebration';
 import LastWeekSummary from '@/components/LastWeekSummary';
+import DailyChecklist from '@/components/DailyChecklist';
 import Link from 'next/link';
 
 export default function KidsPage() {
@@ -138,6 +139,8 @@ export default function KidsPage() {
                         <p className="config-hint">Parents: Create a <code>.env.local</code> file with your Firebase config.</p>
                     </div>
 
+                    <DailyChecklist />
+
                     <div className="screen-time-info">
                         <h3>📺 When Can You Play?</h3>
                         <div className="time-cards">
@@ -185,6 +188,8 @@ export default function KidsPage() {
                         🎉 It&apos;s flex time window! You can use your extra screen time now!
                     </div>
                 )}
+
+                <DailyChecklist />
 
                 {/* Last Week Summary - shown on weekends */}
                 {weekend && <LastWeekSummary />}

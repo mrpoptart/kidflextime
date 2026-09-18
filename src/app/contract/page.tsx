@@ -50,7 +50,7 @@ export default function ContractPage() {
                 </ul>
                 <p><strong>On certain days:</strong></p>
                 <ul>
-                    <li><strong>Tuesday, Thursday, and Sunday:</strong> showers must be taken</li>
+                    <li><strong>Showers:</strong> Charlie on Monday, Wednesday, and Sunday. Malcolm and Henry on Tuesday, Thursday, and Sunday.</li>
                     <li><strong>Thursday night:</strong> the trash goes out &mdash; every trash can in the house gets emptied and the cans go out to the curb</li>
                 </ul>
             </section>

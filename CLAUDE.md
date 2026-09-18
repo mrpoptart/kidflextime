@@ -42,6 +42,19 @@ On weekdays (Monday–Friday), only the current week's section is shown.
 - **Screen time cutoff:** 8:30 PM on school nights, 9:30 PM on non-school nights. The 2 hours never runs past the cutoff, so a late verification means less than the full 2 hours.
 - **Flex time viewing window:** Saturday or Sunday, 10:00 AM – 12:00 PM (based on the winning vote)
 
+### Daily checklist
+
+The Kids page shows a checklist of every chore owed **today**, as a grid with one row per task and one
+column per kid (**Malcolm, Henry, Charlie** — that column order). It is **localStorage only** (key
+`kidflextime.checklist.v1`, never Firestore) and **resets at midnight** every night: stored state is
+stamped with the local date and discarded on read once that date has passed.
+
+Task schedule (`src/lib/daily-checklist.ts`):
+
+- **Every day, all kids:** projector room, bedroom, living room, dining room, downstairs bathrooms, the walk, teeth
+- **Showers:** Charlie on Mon/Wed/Sun; Malcolm and Henry on Tue/Thu/Sun
+- **Thursday:** trash — every can in the house emptied and the cans out to the curb
+
 ### Voting
 
 - Three kids (Charlie, Malcolm, Henry) each vote for Saturday or Sunday
