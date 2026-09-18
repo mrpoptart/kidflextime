@@ -67,7 +67,6 @@ export default function ContractPage() {
                 <h2><span className="section-emoji">📏</span> House Rules</h2>
                 <ul>
                     <li><strong>All kids must complete their chores before anyone gets screen time.</strong> You succeed together or you fail together &mdash; no one plays until everyone is done.</li>
-                    <li>Everyone goes on a walk</li>
                     <li>Parents are required to be helpful and not adversarial (no devil&apos;s bargains)</li>
                     <li>Parents check chores &mdash; and re-checks after a correction &mdash; as soon as they are able, so no one loses time waiting</li>
                 </ul>

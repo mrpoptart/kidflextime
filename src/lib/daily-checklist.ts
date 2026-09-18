@@ -111,24 +111,6 @@ export function getChecklistForDay(day: number): ChecklistRow[] {
         });
     }
 
-    rows.push(
-        {
-            id: 'walk',
-            emoji: '🚶',
-            label: 'Go on the walk',
-            scheduled: false,
-            owedBy: EVERYONE
-        },
-        {
-            id: 'teeth',
-            emoji: '🦷',
-            label: 'Teeth brushed and flossed',
-            detail: 'At or before 8:00 PM, screen time or not',
-            scheduled: false,
-            owedBy: EVERYONE
-        }
-    );
-
     return rows;
 }
 
