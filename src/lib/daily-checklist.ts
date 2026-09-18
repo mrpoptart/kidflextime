@@ -85,6 +85,41 @@ export function getChecklistForDay(day: number): ChecklistRow[] {
             label: 'Downstairs bathrooms tidy',
             scheduled: false,
             owedBy: EVERYONE
+        },
+        {
+            id: 'sweep-dining',
+            emoji: '🧹',
+            label: 'Sweep the dining room',
+            scheduled: false,
+            owedBy: EVERYONE
+        },
+        {
+            id: 'sweep-living',
+            emoji: '🧹',
+            label: 'Sweep the living room',
+            scheduled: false,
+            owedBy: EVERYONE
+        },
+        {
+            id: 'sweep-projector',
+            emoji: '🧹',
+            label: 'Sweep the projector room',
+            scheduled: false,
+            owedBy: EVERYONE
+        },
+        {
+            id: 'sweep-hallway',
+            emoji: '🧹',
+            label: 'Sweep the hallway',
+            scheduled: false,
+            owedBy: EVERYONE
+        },
+        {
+            id: 'sweep-bedrooms',
+            emoji: '🧹',
+            label: 'Sweep the bedrooms',
+            scheduled: false,
+            owedBy: EVERYONE
         }
     ];
 

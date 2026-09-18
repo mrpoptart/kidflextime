@@ -51,7 +51,8 @@ stamped with the local date and discarded on read once that date has passed.
 
 Task schedule (`src/lib/daily-checklist.ts`):
 
-- **Every day, all kids:** projector room, bedroom, living room, dining room, downstairs bathrooms
+- **Every day, all kids — picked up:** projector room, bedroom, living room, dining room, downstairs bathrooms
+- **Every day, all kids — swept:** dining room, living room, projector room, hallway, bedrooms
 - **Showers:** Charlie on Mon/Wed/Sun; Malcolm and Henry on Tue/Thu/Sun
 - **Thursday:** trash — every can in the house emptied and the cans out to the curb
 
