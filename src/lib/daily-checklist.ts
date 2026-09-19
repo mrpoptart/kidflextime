@@ -62,20 +62,9 @@ function sharedRow(id: string, emoji: string, label: string, detail?: string): C
 // Build today's checklist. Every task on this list has to be done before a
 // parent starts verifying, or it comes out of the 2-hour timer.
 export function getChecklistForDay(day: number): ChecklistRow[] {
+    // Each kid's own tasks come first, so everyone sees what they owe before
+    // the shared house jobs.
     const rows: ChecklistRow[] = [
-        // Shared house chores: one check each, whoever gets to it
-        sharedRow('projector-room', '📽️', 'Projector room clean'),
-        sharedRow('living-room', '🛋️', 'Living room clean'),
-        sharedRow('dining-room', '🍽️', 'Dining room clean'),
-        sharedRow('bathroom-black', '🚽', 'Black downstairs bathroom tidy'),
-        sharedRow('bathroom-other', '🚽', 'Other downstairs bathroom tidy'),
-        sharedRow('sweep-dining', '🧹', 'Sweep the dining room'),
-        sharedRow('sweep-living', '🧹', 'Sweep the living room'),
-        sharedRow('sweep-projector', '🧹', 'Sweep the projector room'),
-        sharedRow('sweep-hallway', '🧹', 'Sweep the hallway'),
-        sharedRow('sweep-bedrooms', '🧹', 'Sweep the bedrooms'),
-
-        // Everyone owes their own
         {
             id: 'bedroom',
             emoji: '🛏️',
@@ -113,6 +102,20 @@ export function getChecklistForDay(day: number): ChecklistRow[] {
             owedBy: [...showerKids]
         });
     }
+
+    // Shared house chores: one check each, whoever gets to it
+    rows.push(
+        sharedRow('projector-room', '📽️', 'Projector room clean'),
+        sharedRow('living-room', '🛋️', 'Living room clean'),
+        sharedRow('dining-room', '🍽️', 'Dining room clean'),
+        sharedRow('bathroom-black', '🚽', 'Black downstairs bathroom tidy'),
+        sharedRow('bathroom-other', '🚽', 'Other downstairs bathroom tidy'),
+        sharedRow('sweep-dining', '🧹', 'Sweep the dining room'),
+        sharedRow('sweep-living', '🧹', 'Sweep the living room'),
+        sharedRow('sweep-projector', '🧹', 'Sweep the projector room'),
+        sharedRow('sweep-hallway', '🧹', 'Sweep the hallway'),
+        sharedRow('sweep-bedrooms', '🧹', 'Sweep the bedrooms')
+    );
 
     if (day === THURSDAY) {
         rows.push({
