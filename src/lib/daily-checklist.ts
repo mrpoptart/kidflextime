@@ -100,8 +100,8 @@ export function getChecklistForDay(day: number): ChecklistRow[] {
             label: 'Take the trash out',
             detail: 'Every can in the house emptied, cans out to the curb',
             scheduled: true,
-            shared: false,
-            owedBy: EVERYONE
+            shared: true,
+            owedBy: []
         });
     }
 

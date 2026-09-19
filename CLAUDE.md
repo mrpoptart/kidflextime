@@ -54,8 +54,8 @@ Task schedule (`src/lib/daily-checklist.ts`):
 - **Shared rows** (`shared: true`) get a **single checkbox for the whole house**, not one per kid — whoever does it, does it. They are stored under `<taskId>:house` and count once toward the total.
 - **Every day, shared:** projector room clean, living room clean, dining room clean, black downstairs bathroom, other downstairs bathroom, and sweeping the dining room, living room, projector room, hallway and bedrooms
 - **Every day, per kid:** own bedroom clean
-- **Showers:** Charlie on Mon/Wed/Sun; Malcolm and Henry on Tue/Thu/Sun
-- **Thursday:** trash — every can in the house emptied and the cans out to the curb
+- **Showers, per kid:** Charlie on Mon/Wed/Sun; Malcolm and Henry on Tue/Thu/Sun — only the kids who owe one that night get a checkbox
+- **Thursday, shared:** trash — every can in the house emptied and the cans out to the curb
 
 ### Voting
 
