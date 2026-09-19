@@ -57,6 +57,9 @@ export default function ContractPage() {
                 <p><strong>Every day &mdash; your own:</strong></p>
                 <ul>
                     <li>Your bedroom must be clean</li>
+                    <li><strong>Charlie:</strong> 15 minutes of music practice</li>
+                    <li><strong>Henry:</strong> 15 minutes of music practice</li>
+                    <li><strong>Malcolm:</strong> 15 minutes of ASL practice</li>
                 </ul>
                 <p><strong>On certain days:</strong></p>
                 <ul>

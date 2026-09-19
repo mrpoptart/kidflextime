@@ -44,6 +44,13 @@ export interface ChecklistRow {
     shared: boolean;
     /** Kids who owe this task today. Empty for shared rows. */
     owedBy: KidName[];
+    /** Per-kid icon and label, for rows where each kid owes something different */
+    kidTasks?: Partial<Record<KidName, KidTask>>;
+}
+
+export interface KidTask {
+    icon: string;
+    label: string;
 }
 
 const EVERYONE: KidName[] = [...CHECKLIST_KIDS];
@@ -77,6 +84,20 @@ export function getChecklistForDay(day: number): ChecklistRow[] {
             scheduled: false,
             shared: false,
             owedBy: EVERYONE
+        },
+        {
+            id: 'practice',
+            emoji: '⏱️',
+            label: '15 minutes of practice',
+            detail: 'Music for Charlie and Henry, ASL for Malcolm',
+            scheduled: false,
+            shared: false,
+            owedBy: EVERYONE,
+            kidTasks: {
+                malcolm: { icon: '🤟', label: '15 minutes of ASL practice' },
+                henry: { icon: '🎹', label: '15 minutes of music practice' },
+                charlie: { icon: '🎹', label: '15 minutes of music practice' }
+            }
         }
     ];
 

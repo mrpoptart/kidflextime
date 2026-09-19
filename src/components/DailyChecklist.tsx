@@ -151,17 +151,24 @@ export default function DailyChecklist() {
 
                                         const key = cellId(row.id, kid);
 
+                                        const kidTask = row.kidTasks?.[kid];
+
                                         return (
                                             <td key={kid} className="checklist-cell">
-                                                <label className="checklist-check">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={!!checked[key]}
-                                                        onChange={() => toggle(key)}
-                                                        aria-label={`${KID_LABELS[kid]}: ${row.label}`}
-                                                    />
-                                                    <span className="checklist-box" aria-hidden="true" />
-                                                </label>
+                                                <span className="checklist-cell-inner">
+                                                    {kidTask && (
+                                                        <span className="checklist-cell-icon" aria-hidden="true">{kidTask.icon}</span>
+                                                    )}
+                                                    <label className="checklist-check">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={!!checked[key]}
+                                                            onChange={() => toggle(key)}
+                                                            aria-label={`${KID_LABELS[kid]}: ${kidTask?.label ?? row.label}`}
+                                                        />
+                                                        <span className="checklist-box" aria-hidden="true" />
+                                                    </label>
+                                                </span>
                                             </td>
                                         );
                                     })
