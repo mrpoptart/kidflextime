@@ -40,85 +40,42 @@ export interface ChecklistRow {
     detail?: string;
     /** True for rows that only show up on certain days (showers, trash) */
     scheduled: boolean;
-    /** Kids who owe this task today */
+    /** One check for the whole house: whoever does it, does it */
+    shared: boolean;
+    /** Kids who owe this task today. Empty for shared rows. */
     owedBy: KidName[];
 }
 
 const EVERYONE: KidName[] = [...CHECKLIST_KIDS];
 
+function sharedRow(id: string, emoji: string, label: string, detail?: string): ChecklistRow {
+    return { id, emoji, label, detail, scheduled: false, shared: true, owedBy: [] };
+}
+
 // Build today's checklist. Every task on this list has to be done before a
 // parent starts verifying, or it comes out of the 2-hour timer.
 export function getChecklistForDay(day: number): ChecklistRow[] {
     const rows: ChecklistRow[] = [
-        {
-            id: 'projector-room',
-            emoji: '📽️',
-            label: 'Projector room clean',
-            scheduled: false,
-            owedBy: EVERYONE
-        },
+        // Shared house chores: one check each, whoever gets to it
+        sharedRow('projector-room', '📽️', 'Projector room clean'),
+        sharedRow('living-room', '🛋️', 'Living room clean'),
+        sharedRow('dining-room', '🍽️', 'Dining room clean'),
+        sharedRow('bathroom-black', '🚽', 'Black downstairs bathroom tidy'),
+        sharedRow('bathroom-other', '🚽', 'Other downstairs bathroom tidy'),
+        sharedRow('sweep-dining', '🧹', 'Sweep the dining room'),
+        sharedRow('sweep-living', '🧹', 'Sweep the living room'),
+        sharedRow('sweep-projector', '🧹', 'Sweep the projector room'),
+        sharedRow('sweep-hallway', '🧹', 'Sweep the hallway'),
+        sharedRow('sweep-bedrooms', '🧹', 'Sweep the bedrooms'),
+
+        // Everyone owes their own
         {
             id: 'bedroom',
             emoji: '🛏️',
             label: 'Bedroom clean',
             detail: 'Your own room',
             scheduled: false,
-            owedBy: EVERYONE
-        },
-        {
-            id: 'living-room',
-            emoji: '🛋️',
-            label: 'Living room clean',
-            scheduled: false,
-            owedBy: EVERYONE
-        },
-        {
-            id: 'dining-room',
-            emoji: '🍽️',
-            label: 'Dining room clean',
-            scheduled: false,
-            owedBy: EVERYONE
-        },
-        {
-            id: 'bathrooms',
-            emoji: '🚽',
-            label: 'Downstairs bathrooms tidy',
-            scheduled: false,
-            owedBy: EVERYONE
-        },
-        {
-            id: 'sweep-dining',
-            emoji: '🧹',
-            label: 'Sweep the dining room',
-            scheduled: false,
-            owedBy: EVERYONE
-        },
-        {
-            id: 'sweep-living',
-            emoji: '🧹',
-            label: 'Sweep the living room',
-            scheduled: false,
-            owedBy: EVERYONE
-        },
-        {
-            id: 'sweep-projector',
-            emoji: '🧹',
-            label: 'Sweep the projector room',
-            scheduled: false,
-            owedBy: EVERYONE
-        },
-        {
-            id: 'sweep-hallway',
-            emoji: '🧹',
-            label: 'Sweep the hallway',
-            scheduled: false,
-            owedBy: EVERYONE
-        },
-        {
-            id: 'sweep-bedrooms',
-            emoji: '🧹',
-            label: 'Sweep the bedrooms',
-            scheduled: false,
+            shared: false,
             owedBy: EVERYONE
         }
     ];
@@ -131,6 +88,7 @@ export function getChecklistForDay(day: number): ChecklistRow[] {
             label: 'Shower',
             detail: 'Tonight is a shower night',
             scheduled: true,
+            shared: false,
             owedBy: [...showerKids]
         });
     }
@@ -142,11 +100,17 @@ export function getChecklistForDay(day: number): ChecklistRow[] {
             label: 'Take the trash out',
             detail: 'Every can in the house emptied, cans out to the curb',
             scheduled: true,
+            shared: false,
             owedBy: EVERYONE
         });
     }
 
     return rows;
+}
+
+// Storage key for a shared row: the house owes it, not any one kid.
+export function sharedCellId(taskId: string): string {
+    return `${taskId}:house`;
 }
 
 export function cellId(taskId: string, kid: KidName): string {

@@ -1918,6 +1918,28 @@ h3 {
   outline-offset: 2px;
 }
 
+.checklist-shared-cell {
+  width: auto;
+}
+
+.checklist-shared-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.checklist-shared-hint {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.row-done .checklist-shared-hint {
+  opacity: 0.55;
+}
+
 .checklist-na {
   color: var(--color-text-muted);
   opacity: 0.4;

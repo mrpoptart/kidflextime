@@ -12,7 +12,8 @@ import {
     getDayKey,
     loadChecklist,
     msUntilMidnight,
-    saveChecklist
+    saveChecklist,
+    sharedCellId
 } from '@/lib/daily-checklist';
 
 export default function DailyChecklist() {
@@ -50,9 +51,8 @@ export default function DailyChecklist() {
         };
     }, []);
 
-    const toggle = useCallback((taskId: string, kid: KidName) => {
+    const toggle = useCallback((key: string) => {
         setChecked((prev) => {
-            const key = cellId(taskId, kid);
             const next = { ...prev };
 
             if (next[key]) {
@@ -70,11 +70,11 @@ export default function DailyChecklist() {
     if (day === null) return null;
 
     const rows = getChecklistForDay(day);
-    const total = rows.reduce((sum, row) => sum + row.owedBy.length, 0);
-    const done = rows.reduce(
-        (sum, row) => sum + row.owedBy.filter((kid) => checked[cellId(row.id, kid)]).length,
-        0
-    );
+    const total = rows.reduce((sum, row) => sum + (row.shared ? 1 : row.owedBy.length), 0);
+    const done = rows.reduce((sum, row) => {
+        if (row.shared) return sum + (checked[sharedCellId(row.id)] ? 1 : 0);
+        return sum + row.owedBy.filter((kid) => checked[cellId(row.id, kid)]).length;
+    }, 0);
     const allDone = done === total;
 
     return (
@@ -105,7 +105,9 @@ export default function DailyChecklist() {
                 </thead>
                 <tbody>
                     {rows.map((row) => {
-                        const rowDone = row.owedBy.every((kid) => checked[cellId(row.id, kid)]);
+                        const rowDone = row.shared
+                            ? !!checked[sharedCellId(row.id)]
+                            : row.owedBy.every((kid) => checked[cellId(row.id, kid)]);
 
                         return (
                             <tr key={row.id} className={rowDone ? 'row-done' : ''}>
@@ -122,31 +124,48 @@ export default function DailyChecklist() {
                                     </span>
                                 </th>
 
-                                {CHECKLIST_KIDS.map((kid) => {
-                                    if (!row.owedBy.includes(kid)) {
-                                        return (
-                                            <td key={kid} className="checklist-cell">
-                                                <span className="checklist-na" aria-label={`${KID_LABELS[kid]}: not today`}>—</span>
-                                            </td>
-                                        );
-                                    }
-
-                                    const key = cellId(row.id, kid);
-
-                                    return (
-                                        <td key={kid} className="checklist-cell">
+                                {row.shared ? (
+                                    <td className="checklist-cell checklist-shared-cell" colSpan={CHECKLIST_KIDS.length}>
+                                        <span className="checklist-shared-inner">
                                             <label className="checklist-check">
                                                 <input
                                                     type="checkbox"
-                                                    checked={!!checked[key]}
-                                                    onChange={() => toggle(row.id, kid)}
-                                                    aria-label={`${KID_LABELS[kid]}: ${row.label}`}
+                                                    checked={!!checked[sharedCellId(row.id)]}
+                                                    onChange={() => toggle(sharedCellId(row.id))}
+                                                    aria-label={`${row.label} (anyone can do it)`}
                                                 />
                                                 <span className="checklist-box" aria-hidden="true" />
                                             </label>
-                                        </td>
-                                    );
-                                })}
+                                            <span className="checklist-shared-hint">Anyone</span>
+                                        </span>
+                                    </td>
+                                ) : (
+                                    CHECKLIST_KIDS.map((kid) => {
+                                        if (!row.owedBy.includes(kid)) {
+                                            return (
+                                                <td key={kid} className="checklist-cell">
+                                                    <span className="checklist-na" aria-label={`${KID_LABELS[kid]}: not today`}>—</span>
+                                                </td>
+                                            );
+                                        }
+
+                                        const key = cellId(row.id, kid);
+
+                                        return (
+                                            <td key={kid} className="checklist-cell">
+                                                <label className="checklist-check">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={!!checked[key]}
+                                                        onChange={() => toggle(key)}
+                                                        aria-label={`${KID_LABELS[kid]}: ${row.label}`}
+                                                    />
+                                                    <span className="checklist-box" aria-hidden="true" />
+                                                </label>
+                                            </td>
+                                        );
+                                    })
+                                )}
                             </tr>
                         );
                     })}

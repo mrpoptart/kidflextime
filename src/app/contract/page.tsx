@@ -40,21 +40,23 @@ export default function ContractPage() {
             <section className="contract-section">
                 <h2><span className="section-emoji">✅</span> Chores Checked Before Screen Time</h2>
                 <p>All of the following must be completed <strong>by everyone</strong> before any screens are touched. If one person hasn&apos;t finished, nobody gets screen time:</p>
-                <p><strong>Every day &mdash; picked up:</strong></p>
+                <p><strong>Every day &mdash; shared jobs:</strong></p>
                 <ul>
                     <li>The projector room must be clean</li>
-                    <li>All bedrooms must be clean</li>
                     <li>The living room must be clean</li>
                     <li>The dining room must be clean</li>
-                    <li>The downstairs bathrooms must be tidy</li>
-                </ul>
-                <p><strong>Every day &mdash; swept:</strong></p>
-                <ul>
+                    <li>The black downstairs bathroom must be tidy</li>
+                    <li>The other downstairs bathroom must be tidy</li>
                     <li>The dining room must be swept</li>
                     <li>The living room must be swept</li>
                     <li>The projector room must be swept</li>
                     <li>The hallway must be swept</li>
                     <li>The bedrooms must be swept</li>
+                </ul>
+                <p>A shared job only has to be done <strong>once</strong> &mdash; whoever does it, does it. It still has to be finished before anyone plays.</p>
+                <p><strong>Every day &mdash; your own:</strong></p>
+                <ul>
+                    <li>Your bedroom must be clean</li>
                 </ul>
                 <p><strong>On certain days:</strong></p>
                 <ul>
