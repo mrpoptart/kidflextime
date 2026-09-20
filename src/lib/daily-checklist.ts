@@ -25,6 +25,10 @@ const MONDAY = 1;
 const TUESDAY = 2;
 const WEDNESDAY = 3;
 const THURSDAY = 4;
+const SATURDAY = 6;
+
+// Charlie practices drums on these nights and piano on the rest
+const CHARLIE_DRUM_DAYS = [TUESDAY, THURSDAY, SATURDAY];
 
 // Shower nights, per kid
 const SHOWER_NIGHTS: Record<KidName, number[]> = {
@@ -85,7 +89,9 @@ export function getChecklistForDay(day: number): ChecklistRow[] {
             kidTasks: {
                 malcolm: { icon: '🤟', label: '15 minutes of ASL practice' },
                 henry: { icon: '🎹', label: '15 minutes of music practice' },
-                charlie: { icon: '🎹', label: '15 minutes of music practice' }
+                charlie: CHARLIE_DRUM_DAYS.includes(day)
+                    ? { icon: '🥁', label: '15 minutes of drum practice' }
+                    : { icon: '🎹', label: '15 minutes of piano practice' }
             }
         }
     ];
