@@ -62,6 +62,11 @@ Use the named helpers rather than reaching for `getWeekId` directly:
 - `isInPayoutWindow(day, now)` - 10:00-12:00 **on the winning day only**, never both days
 - `getPayoutWeekend(now)` - one call returning the week id, totals, locked day and timing
 
+**Use it or lose it.** There is deliberately **no spend tracking**: the balance records what was
+*earned*, and the payout window says when it may be used. Nothing marks time consumed, and unused
+time does not roll over or accumulate — once the window closes it is simply gone. Do not add
+spending, redemption or carry-over state.
+
 **Voting:** a week's vote decides that week's payout weekend and becomes final when the week rolls
 over at Saturday midnight. Votes can still be changed any day (no locking) - a vote cast during a
 payout weekend simply applies to the *next* payout. Never label the live vote as "this weekend".

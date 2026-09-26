@@ -22,7 +22,7 @@ function headline(payout: PayoutWeekend): { text: string; tone: string } {
         case 'tomorrow':
             return { text: `Use it TOMORROW (${day}) between 10:00 AM and 12:00 PM.`, tone: 'tomorrow' };
         case 'passed':
-            return { text: `${day}'s window has already passed for this weekend.`, tone: 'passed' };
+            return { text: `${day}'s window has passed, so this time is gone — flex time does not roll over.`, tone: 'passed' };
         default:
             return { text: `This weekend's flex time is on ${day}.`, tone: 'today' };
     }

@@ -88,7 +88,8 @@ export default function ContractPage() {
                     <li><strong>10 minutes</strong> of flex time for each bonus</li>
                     <li>All flex time is <strong>shared</strong> between all children</li>
                     <li>Flex time is capped at <strong>2 hours</strong> per week</li>
-                    <li>Flex time is used <strong>10:00 AM &ndash; 12:00 PM</strong> on either Saturday or Sunday, decided by a popular vote of the kids</li>
+                    <li>What you earn in a week is used on the <strong>following weekend</strong>, <strong>10:00 AM &ndash; 12:00 PM</strong> on either Saturday or Sunday, decided by a popular vote of the kids</li>
+                    <li><strong>Use it or lose it.</strong> Once that window closes the time is gone &mdash; it does not roll over and it cannot be saved up</li>
                     <li>If you earn 2 hours of flex time for <strong>2 weeks in a row</strong>, you can negotiate flexibility in this contract</li>
                     <li>All flexibility requests must be made at least <strong>12 hours in advance</strong></li>
                 </ul>
