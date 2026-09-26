@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { KidName } from '@/lib/flex-time';
 import {
     CHECKLIST_KIDS,
     ChecklistState,

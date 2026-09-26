@@ -5,13 +5,17 @@ import {
     getWeeklyFlexTime,
     checkStreak,
     getWeekEnd,
-    isInViewingWindow,
+    getPayoutWeekend,
+    isInPayoutWindow,
     isFirebaseConfigured,
     isWeekend,
     subscribeToDayPreferences,
     updateDayPreference,
     calculateWinningDay,
+    formatMinutes,
+    getNextPayoutWeekendLabel,
     DayPreferenceData,
+    PayoutWeekend,
     DayPreference,
     KidName,
     KIDS
@@ -20,7 +24,7 @@ import { WeeklyFlexTime } from '@/types';
 import FlexTimeBalance from '@/components/FlexTimeBalance';
 import WeeklyNotes from '@/components/WeeklyNotes';
 import StreakCelebration from '@/components/StreakCelebration';
-import LastWeekSummary from '@/components/LastWeekSummary';
+import PayoutWeekendPanel from '@/components/PayoutWeekendPanel';
 import DailyChecklist from '@/components/DailyChecklist';
 import Link from 'next/link';
 
@@ -33,16 +37,21 @@ export default function KidsPage() {
     const [timeUntilReset, setTimeUntilReset] = useState('');
     const [dayPreferences, setDayPreferences] = useState<DayPreferenceData | null>(null);
     const [updating, setUpdating] = useState<KidName | null>(null);
+    // The weekend in progress spends LAST week's total, on the day last week's
+    // vote chose. Null on a weekday.
+    const [payout, setPayout] = useState<PayoutWeekend | null>(null);
 
     useEffect(() => {
         async function loadData() {
             try {
-                const [weeklyData, streakData] = await Promise.all([
+                const [weeklyData, streakData, payoutData] = await Promise.all([
                     getWeeklyFlexTime(),
-                    checkStreak()
+                    checkStreak(),
+                    getPayoutWeekend()
                 ]);
                 setFlexTime(weeklyData);
                 setStreak(streakData);
+                setPayout(payoutData);
             } catch (err) {
                 console.error('Failed to load flex time data:', err);
                 setError('Could not load flex time data.');
@@ -109,8 +118,12 @@ export default function KidsPage() {
         }
     }, [dayPreferences, updating]);
 
-    const inWindow = isInViewingWindow();
     const weekend = isWeekend();
+    // Only open on the day the vote actually chose, and only if there is
+    // something to spend.
+    const inWindow = !!payout && payout.flexTime.balance > 0 && isInPayoutWindow(payout.payoutDay);
+    // The weekend this week's earnings pay out on.
+    const nextPayoutLabel = getNextPayoutWeekendLabel();
 
     if (loading) {
         return (
@@ -185,18 +198,23 @@ export default function KidsPage() {
             <main className="kids-main">
                 {inWindow && (
                     <div className="viewing-window-alert">
-                        🎉 It&apos;s flex time window! You can use your extra screen time now!
+                        🎉 It&apos;s flex time right now! Use the {formatMinutes(payout!.flexTime.balance)} you
+                        earned last week &mdash; the window closes at 12:00 PM.
                     </div>
                 )}
 
                 <DailyChecklist />
 
-                {/* Last Week Summary - shown on weekends */}
-                {weekend && <LastWeekSummary />}
+                {/* What last week earned, and whether it lands today or tomorrow */}
+                {weekend && <PayoutWeekendPanel />}
 
                 {flexTime && (
                     <>
-                        <FlexTimeBalance balance={flexTime.balance} />
+                        <FlexTimeBalance
+                            balance={flexTime.balance}
+                            label="Earning for next weekend"
+                            caption={`Everything you earn this week is spent on the weekend of ${nextPayoutLabel}.`}
+                        />
 
                         <div className="reset-timer">
                             {timeUntilReset}
@@ -221,22 +239,30 @@ export default function KidsPage() {
                     <p className="time-note">Your 2 hours start the moment a parent begins checking your chores &mdash; fixing something eats into your time. Screens off at 8:30 PM on school nights, 9:30 PM on other nights.</p>
                 </div>
 
-                {/* Day Preference Voting Section */}
+                {/* Voting decides the NEXT payout weekend, never the one in progress */}
                 <div className="day-preference-section">
-                    <h3>🗳️ When is Flex Time This Week?</h3>
+                    <h3>🗳️ Which day for the weekend of {nextPayoutLabel}?</h3>
+
+                    {payout && (
+                        <div className="locked-vote">
+                            This weekend is already decided:{' '}
+                            <strong>{payout.payoutDay === 'saturday' ? 'Saturday' : 'Sunday'}</strong>,
+                            from last week&apos;s vote. These toggles are for the weekend after.
+                        </div>
+                    )}
 
                     {dayPreferences && (
                         <>
                             {/* Show the current winning day */}
                             <div className="decided-day">
-                                <span className="decided-label">This week&apos;s flex time is on:</span>
+                                <span className="decided-label">Winning so far:</span>
                                 <span className="decided-value">
                                     {calculateWinningDay(dayPreferences.preferences) === 'saturday' ? '🎮 Saturday' : '🎮 Sunday'}
                                 </span>
                             </div>
 
                             <div className="voting-status open">
-                                Vote now! Votes reset every Saturday.
+                                Vote any time this week. The vote is locked in when the week ends on Saturday.
                             </div>
 
                             {/* Kid toggles */}

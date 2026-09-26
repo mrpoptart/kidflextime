@@ -2,12 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { getWeeklyFlexTime, checkStreak, deleteFlexTimeEntry, isWeekend } from '@/lib/flex-time';
+import {
+    getWeeklyFlexTime,
+    checkStreak,
+    deleteFlexTimeEntry,
+    isWeekend,
+    getNextPayoutWeekendLabel
+} from '@/lib/flex-time';
 import { WeeklyFlexTime, FlexTimeEntry } from '@/types';
 import FlexTimeBalance from '@/components/FlexTimeBalance';
 import AddFlexTimeButton from '@/components/AddFlexTimeButton';
 import WeeklyNotes from '@/components/WeeklyNotes';
-import LastWeekSummary from '@/components/LastWeekSummary';
+import PayoutWeekendPanel from '@/components/PayoutWeekendPanel';
 import Link from 'next/link';
 
 export default function ParentPage() {
@@ -53,6 +59,8 @@ export default function ParentPage() {
             setAuthError(errorMessage);
         }
     };
+
+    const nextPayoutLabel = getNextPayoutWeekendLabel();
 
     const handleDeleteEntry = async () => {
         if (!entryToDelete) return;
@@ -161,8 +169,8 @@ export default function ParentPage() {
                     </div>
                 )}
 
-                {/* Last Week Summary - shown on weekends */}
-                {isWeekend() && <LastWeekSummary />}
+                {/* What last week earned and when it can be spent */}
+                {isWeekend() && <PayoutWeekendPanel />}
 
                 {loading ? (
                     <div className="loading-spinner">⏰</div>
@@ -170,7 +178,11 @@ export default function ParentPage() {
                     <p className="error">{error}</p>
                 ) : flexTime && (
                     <>
-                        <FlexTimeBalance balance={flexTime.balance} />
+                        <FlexTimeBalance
+                            balance={flexTime.balance}
+                            label="Earning for next weekend"
+                            caption={`This week's total is spent on the weekend of ${nextPayoutLabel}.`}
+                        />
 
                         <AddFlexTimeButton
                             currentBalance={flexTime.balance}

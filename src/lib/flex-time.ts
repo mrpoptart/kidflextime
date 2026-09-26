@@ -54,16 +54,74 @@ export function getWeekId(date: Date = new Date()): string {
     return `${year}-${month}-${day}`;
 }
 
-// Check if we're currently in the flex time viewing window (Sat/Sun 10am-12pm)
-export function isInViewingWindow(date: Date = new Date()): boolean {
-    const day = date.getDay();
-    const hours = date.getHours();
+// ===== Earning weeks vs. payout weekends =====
+//
+// A flex time week runs Saturday 00:00 to the following Saturday 00:00, and is
+// identified by the Saturday that opens it. Flex time is EARNED across that
+// week and SPENT on the weekend that opens the NEXT week:
+//
+//   Sat 9/19 .. Fri 9/25   earning week "2026-09-19"
+//   Sat 9/26 / Sun 9/27    that week's payout weekend
+//                          (and the start of earning week "2026-09-26")
+//
+// So on any Saturday or Sunday, three different things are true at once, and
+// the app has to keep them apart:
+//   - last week's total is what can be spent this weekend
+//   - the day it lands on was decided by LAST week's vote, now final
+//   - anything earned today counts toward NEXT weekend, on a live vote
 
-    // Saturday (6) or Sunday (0), between 10:00 AM and 12:00 PM
-    if (day === 0 || day === 6) {
-        return hours >= 10 && hours < 12;
+// The week currently accruing flex time. Same as getWeekId; named for intent.
+export function getEarningWeekId(date: Date = new Date()): string {
+    return getWeekId(date);
+}
+
+// The week whose earnings this weekend spends, or null on a weekday.
+export function getPayoutWeekId(date: Date = new Date()): string | null {
+    return isWeekend(date) ? getPreviousWeekId(date) : null;
+}
+
+// The week that pays out on the next weekend to come. The week you are earning
+// now always pays out on the weekend that opens the following week, so on a
+// weekday this is the coming weekend and on a payout weekend it is the one after.
+export function getNextPayoutWeekId(date: Date = new Date()): string {
+    return getWeekId(date);
+}
+
+// The Saturday that opens the payout weekend for a given earning week.
+export function getPayoutWeekendStart(weekId: string): Date {
+    const [year, month, day] = weekId.split('-').map(Number);
+    const start = new Date(year, month - 1, day, 0, 0, 0, 0);
+    start.setDate(start.getDate() + 7);
+    return start;
+}
+
+// Where the payout day sits relative to now.
+export type PayoutTiming = 'today' | 'tomorrow' | 'passed' | 'upcoming';
+
+export function getPayoutTiming(payoutDay: DayPreference, date: Date = new Date()): PayoutTiming {
+    const day = date.getDay();
+
+    if (day === 6) {
+        // Saturday: either today, or tomorrow if Sunday won
+        return payoutDay === 'saturday' ? 'today' : 'tomorrow';
     }
-    return false;
+
+    if (day === 0) {
+        // Sunday: either today, or the Saturday window is already gone
+        return payoutDay === 'sunday' ? 'today' : 'passed';
+    }
+
+    // Monday to Friday: this week's earnings pay out on the coming weekend
+    return 'upcoming';
+}
+
+// Is the 10:00 AM - 12:00 PM window open on the day the vote actually chose?
+export function isInPayoutWindow(payoutDay: DayPreference, date: Date = new Date()): boolean {
+    const wantedDay = payoutDay === 'saturday' ? 6 : 0;
+    if (date.getDay() !== wantedDay) return false;
+
+    const hours = date.getHours();
+    return hours >= 10 && hours < 12;
 }
 
 // Check if it's a weekend (Saturday or Sunday)
@@ -379,14 +437,16 @@ export async function deleteFlexTimeEntry(
         };
     }
 
-    const weekId = getWeekId();
+    // An entry lives in the week its own timestamp falls in, which is not
+    // necessarily the current week: parents can backdate.
+    const weekId = getWeekId(entryTimestamp);
     const docRef = doc(db, 'flexTime', weekId);
     const docSnap = await getDoc(docRef);
 
     if (!docSnap.exists()) {
         return {
             success: false,
-            message: 'No flex time data found for this week',
+            message: 'No flex time data found for that week',
             newBalance: 0
         };
     }
@@ -426,15 +486,59 @@ export async function deleteFlexTimeEntry(
         lastUpdated: new Date()
     });
 
-    // Update weekly stats
-    const weekStart = getWeekStart();
-    await updateWeeklyStats(weekId, weekStart, newBalance);
+    // Update weekly stats for the week the entry belonged to
+    await updateWeeklyStats(weekId, getWeekStart(entryTimestamp), newBalance);
 
     return {
         success: true,
         message: `Removed ${removedEntry.minutes} minutes. New balance: ${newBalance} minutes`,
         newBalance
     };
+}
+
+// Everything the app needs to describe the payout weekend in progress:
+// whose week is being spent, how much, which day it lands on, and whether that
+// day is today, tomorrow or already gone. Null on a weekday.
+export interface PayoutWeekend {
+    /** The earning week whose total is being spent this weekend */
+    weekId: string;
+    flexTime: WeeklyFlexTime;
+    /** Decided by that week's vote, and final now the week has closed */
+    payoutDay: DayPreference;
+    timing: PayoutTiming;
+}
+
+export async function getPayoutWeekend(date: Date = new Date()): Promise<PayoutWeekend | null> {
+    const weekId = getPayoutWeekId(date);
+    if (!weekId) return null;
+
+    const [flexTime, preferences] = await Promise.all([
+        getWeeklyFlexTimeForWeek(weekId),
+        getDayPreferencesForWeek(weekId)
+    ]);
+
+    const payoutDay = calculateWinningDay(preferences.preferences);
+
+    return { weekId, flexTime, payoutDay, timing: getPayoutTiming(payoutDay, date) };
+}
+
+// "Oct 3". Deliberately omits the weekday: a payout can land on either day of
+// its weekend, so naming Saturday would be misleading.
+function formatMonthDay(date: Date): string {
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+// Names an earning week by the Saturday that opens it.
+export function formatWeekLabel(weekId: string): string {
+    const [year, month, day] = weekId.split('-').map(Number);
+    return formatMonthDay(new Date(year, month - 1, day));
+}
+
+// Names the WEEKEND that the week being earned right now pays out on, which is
+// always a week after that week opens. This is the label for "what you are
+// earning toward" — never the earning week's own label.
+export function getNextPayoutWeekendLabel(date: Date = new Date()): string {
+    return formatMonthDay(getPayoutWeekendStart(getNextPayoutWeekId(date)));
 }
 
 // Format minutes as human-readable string

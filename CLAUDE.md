@@ -36,11 +36,41 @@ On Saturday and Sunday, both Kids and Parent pages show **two sections**:
 The Last Week's Results section is **only shown on weekends** (Saturday/Sunday).
 On weekdays (Monday–Friday), only the current week's section is shown.
 
+### Flex time: earning weeks vs. payout weekends
+
+Flex time is **earned across a week and spent on the weekend that opens the NEXT week**:
+
+```
+Sat 9/19 .. Fri 9/25    earning week "2026-09-19"
+Sat 9/26 / Sun 9/27     that week's payout weekend
+                        (and the start of earning week "2026-09-26")
+```
+
+So on any Saturday or Sunday three things are true at once, and the app must keep them apart:
+
+1. **Last week's total** is what can be spent this weekend (`getPayoutWeekId` -> the previous week id)
+2. **The day it lands on** was decided by *last week's* vote and is now final (`getPayoutWeekend().payoutDay`)
+3. **Anything earned today** counts toward *next* weekend, on a live vote (`getNextPayoutWeekId` -> the current week id)
+
+Use the named helpers rather than reaching for `getWeekId` directly:
+
+- `getEarningWeekId(now)` - the week currently accruing
+- `getPayoutWeekId(now)` - the week being spent this weekend, or `null` on a weekday
+- `getNextPayoutWeekId(now)` - the week that pays out on the next weekend to come
+- `getPayoutWeekendStart(weekId)` / `getNextPayoutWeekendLabel(now)` - when that weekend is
+- `getPayoutTiming(day, now)` - `today` | `tomorrow` | `passed` | `upcoming`
+- `isInPayoutWindow(day, now)` - 10:00-12:00 **on the winning day only**, never both days
+- `getPayoutWeekend(now)` - one call returning the week id, totals, locked day and timing
+
+**Voting:** a week's vote decides that week's payout weekend and becomes final when the week rolls
+over at Saturday midnight. Votes can still be changed any day (no locking) - a vote cast during a
+payout weekend simply applies to the *next* payout. Never label the live vote as "this weekend".
+
 ### Time windows
 
 - **Daily screen time:** There is no fixed start time. A kid asks a parent for screen time; the parent begins verifying chores as soon as they are able, and the **2-hour timer starts the moment verification begins**. If a chore is incomplete, the parent recommends a correction and the kid asks for re-evaluation — **the timer keeps running during fixes**, by design, so corrections eat into screen time. There is **no verification without the timer running** — no practice checks or previews; every check, re-evaluations included, happens on the running clock.
 - **Screen time cutoff:** 8:30 PM on school nights, 9:30 PM on non-school nights. The 2 hours never runs past the cutoff, so a late verification means less than the full 2 hours.
-- **Flex time viewing window:** Saturday or Sunday, 10:00 AM – 12:00 PM (based on the winning vote)
+- **Flex time payout window:** 10:00 AM – 12:00 PM on the single day the payout week's vote chose — Saturday or Sunday, not both
 
 ### Daily checklist
 
