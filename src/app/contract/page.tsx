@@ -46,6 +46,9 @@ export default function ContractPage() {
                     <li><strong>Charlie:</strong> 15 minutes of music practice</li>
                     <li><strong>Henry:</strong> 15 minutes of music practice</li>
                     <li><strong>Malcolm:</strong> 15 minutes of ASL practice</li>
+                    <li><strong>Charlie:</strong> 15 minutes of soccer practice</li>
+                    <li><strong>Henry:</strong> 15 minutes of water polo practice</li>
+                    <li><strong>Malcolm:</strong> 15 minutes of soccer practice</li>
                     <li><strong>Showers:</strong> Charlie on Monday, Wednesday, and Sunday. Malcolm and Henry on Tuesday, Thursday, and Sunday.</li>
                 </ul>
                 <p><strong>Every day &mdash; shared jobs:</strong></p>

@@ -93,6 +93,20 @@ export function getChecklistForDay(day: number): ChecklistRow[] {
                     ? { icon: '🥁', label: '15 minutes of drum practice' }
                     : { icon: '🎹', label: '15 minutes of piano practice' }
             }
+        },
+        {
+            id: 'sports-practice',
+            emoji: '🏃',
+            label: '15 minutes of sports practice',
+            detail: 'Soccer for Charlie and Malcolm, water polo for Henry',
+            scheduled: false,
+            shared: false,
+            owedBy: EVERYONE,
+            kidTasks: {
+                malcolm: { icon: '⚽', label: '15 minutes of soccer practice' },
+                henry: { icon: '🤽', label: '15 minutes of water polo practice' },
+                charlie: { icon: '⚽', label: '15 minutes of soccer practice' }
+            }
         }
     ];
 
