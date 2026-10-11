@@ -90,7 +90,9 @@ Rows are ordered **per-kid tasks first, then the shared house jobs**, so each ki
 personally owe at the top.
 
 - **Shared rows** (`shared: true`) get a **single checkbox for the whole house**, not one per kid — whoever does it, does it. They are stored under `<taskId>:house` and count once toward the total.
-- **Every day, per kid:** own bedroom clean; 15 minutes of practice — music for Charlie and Henry, ASL for Malcolm (one row, with a per-kid icon above each checkbox via `kidTasks`). Charlie's icon is a drum 🥁 on Tue/Thu/Sat and a piano 🎹 on the rest.
+- **Every day, per kid:** own bedroom clean, plus two 15-minute practice rows. Each practice row carries a per-kid icon above its checkbox via `kidTasks`, which also drives that checkbox's accessible label:
+  - **Practice** — music for Charlie and Henry, ASL 🤟 for Malcolm. Charlie's icon is a drum 🥁 on Tue/Thu/Sat and a piano 🎹 on the rest.
+  - **Sports practice** — soccer ⚽ for Charlie and Malcolm, water polo 🤽 for Henry.
 - **Showers, per kid:** Charlie on Mon/Wed/Sun; Malcolm and Henry on Tue/Thu/Sun — only the kids who owe one that night get a checkbox
 - **Every day, shared:** projector room clean, living room clean, dining room clean, black downstairs bathroom, other downstairs bathroom, and sweeping the dining room, living room, projector room, hallway and bedrooms
 - **Thursday, shared:** trash — every can in the house emptied and the cans out to the curb
